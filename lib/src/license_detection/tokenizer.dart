@@ -193,8 +193,9 @@ String _normalizeWord(String text) {
 }
 
 final _headers = HashSet.from(
-    'q w e r t y u i o p a s d f g h j k l z x c v b n m i ii iii iv vi vii ix xi xii xiii xiv xv'
-        .split(' '));
+  'q w e r t y u i o p a s d f g h j k l z x c v b n m i ii iii iv vi vii ix xi xii xiii xiv xv'
+      .split(' '),
+);
 
 final _numberHeaderRe = RegExp(r'^\d{1,2}(\.\d{1,2})*[\.)]$');
 
@@ -208,7 +209,7 @@ final Map<RegExp, String> _equivalentPunctuationMarks = {
   RegExp(r'[“‟”’"‘‛❛❜〝〞«»‹›❝❞]'): "'",
 
   // Guideline 9.1.1: “©”, “(c)”, or “Copyright” should be considered equivalent and interchangeable.
-  RegExp(r'©'): '(c)'
+  RegExp(r'©'): '(c)',
 };
 
 final _wordRegex = RegExp(r'[\w\d][^\s]*');
@@ -263,5 +264,5 @@ final _equivalentWords = {
 final _remainingEquivalentWords = {
   'copyright': ['holder', 'owner'],
   'per': ['cent', 'percent'],
-  'sub': ['license', 'sublicense']
+  'sub': ['license', 'sublicense'],
 };

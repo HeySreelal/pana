@@ -205,11 +205,13 @@ class Tagger {
         }
       }
     } on TagException catch (e) {
-      explanations.add(Explanation(
-        'Tag detection failed.',
-        e.message,
-        tag: null,
-      ));
+      explanations.add(
+        Explanation(
+          'Tag detection failed.',
+          e.message,
+          tag: null,
+        ),
+      );
       return;
     }
   }
@@ -225,10 +227,15 @@ class Tagger {
     if (_isBinaryOnly) {
       // TODO: consider checking `platforms:` is present in `pubspec.yaml`
       tags.addAll(Platform.binaryOnlyAssignedPlatforms.map((p) => p.tag));
-      explanations.addAll(Platform.binaryOnlyNotAssignedPlatforms.map((p) =>
-          Explanation(p.name,
-              'Cannot assign ${p.name} automatically to a binary only package.',
-              tag: p.tag)));
+      explanations.addAll(
+        Platform.binaryOnlyNotAssignedPlatforms.map(
+          (p) => Explanation(
+            p.name,
+            'Cannot assign ${p.name} automatically to a binary only package.',
+            tag: p.tag,
+          ),
+        ),
+      );
       return;
     }
 
@@ -236,10 +243,16 @@ class Tagger {
     for (final platform in Platform.recognizedPlatforms) {
       final results = [
         if (!_usesFlutter && platform.dartRuntime != null)
-          _checkRuntime(platform, platform.dartRuntime!,
-              trustDeclarations: trustDeclarations),
-        _checkRuntime(platform, platform.flutterRuntime,
-            trustDeclarations: trustDeclarations),
+          _checkRuntime(
+            platform,
+            platform.dartRuntime!,
+            trustDeclarations: trustDeclarations,
+          ),
+        _checkRuntime(
+          platform,
+          platform.flutterRuntime,
+          trustDeclarations: trustDeclarations,
+        ),
       ];
 
       final success = results.where((r) => r.isSuccess).toList();
@@ -289,8 +302,11 @@ class Tagger {
       //
       // We still keep the unpruned detection for providing Explanations.
       final prunedLibraryGraph = trustDeclarations
-          ? LibraryGraph(_session, runtime.declaredVariables,
-              isLeaf: declaredPlatformDetector.hasDeclaredPlatforms)
+          ? LibraryGraph(
+              _session,
+              runtime.declaredVariables,
+              isLeaf: declaredPlatformDetector.hasDeclaredPlatforms,
+            )
           : libraryGraph;
 
       final prunedViolationFinder = PlatformViolationFinder(
@@ -302,9 +318,10 @@ class Tagger {
           prunedLibraryGraph,
           runtime,
           (List<Uri> path) => Explanation(
-              'Package not compatible with platform ${platform.name}',
-              'Because:\n${LibraryGraph.formatPath(path)}',
-              tag: platform.tag),
+            'Package not compatible with platform ${platform.name}',
+            'Because:\n${LibraryGraph.formatPath(path)}',
+            tag: platform.tag,
+          ),
         ),
       );
       // Report only the first non-pruned violation as Explanation
@@ -344,7 +361,11 @@ class Tagger {
         tags.addAll(<String>[Runtime.nativeAot.tag, Runtime.nativeJit.tag]);
       } else {
         final dartSdkViolationFinder = SdkViolationFinder(
-            _packageGraph, Sdk.dart, _pubspecCache, _session);
+          _packageGraph,
+          Sdk.dart,
+          _pubspecCache,
+          _session,
+        );
         final sdkViolation =
             dartSdkViolationFinder.findSdkViolation(packageName, _topLibraries);
         if (sdkViolation != null) {
@@ -352,12 +373,14 @@ class Tagger {
         } else {
           for (final runtime in Runtime.recognizedRuntimes) {
             final finder = runtimeViolationFinder(
-                LibraryGraph(_session, runtime.declaredVariables),
-                runtime,
-                (List<Uri> path) => Explanation(
-                    'Package not compatible with runtime ${runtime.name}',
-                    'Because:\n${LibraryGraph.formatPath(path)}',
-                    tag: runtime.tag));
+              LibraryGraph(_session, runtime.declaredVariables),
+              runtime,
+              (List<Uri> path) => Explanation(
+                'Package not compatible with runtime ${runtime.name}',
+                'Because:\n${LibraryGraph.formatPath(path)}',
+                tag: runtime.tag,
+              ),
+            );
             var supports = true;
             for (final lib in _topLibraries) {
               final violationResult = finder.findViolation(lib);
@@ -442,8 +465,13 @@ class Tagger {
               // dart:ui has no package name. So we cannot trivially look it up in
               // the allowed experiments. We just assume it is opted in.
               if (!library.isScheme('package')) return null;
-              if (!isNullSafety(Version(
-                  languageVersionToken.major, languageVersionToken.minor, 0))) {
+              if (!isNullSafety(
+                Version(
+                  languageVersionToken.major,
+                  languageVersionToken.minor,
+                  0,
+                ),
+              )) {
                 return (path) => Explanation(
                       'Package is not null safe',
                       'Because:\n${LibraryGraph.formatPath(path)} where $library '
@@ -476,11 +504,13 @@ class Tagger {
         tags.add(PanaTags.isNullSafe);
       }
     } on TagException catch (e) {
-      explanations.add(Explanation(
-        'Tag detection failed.',
-        e.message,
-        tag: PanaTags.isNullSafe,
-      ));
+      explanations.add(
+        Explanation(
+          'Tag detection failed.',
+          e.message,
+          tag: PanaTags.isNullSafe,
+        ),
+      );
     }
   }
 }

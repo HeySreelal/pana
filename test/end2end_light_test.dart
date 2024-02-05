@@ -18,10 +18,12 @@ void main() {
         .resolveSymbolicLinksSync();
     final pubCacheDir = p.join(tempDir, 'pub-cache');
     Directory(pubCacheDir).createSync();
-    analyzer = PackageAnalyzer(await ToolEnvironment.create(
-      pubCacheDir: pubCacheDir,
-      dartdocVersion: 'any',
-    ));
+    analyzer = PackageAnalyzer(
+      await ToolEnvironment.create(
+        pubCacheDir: pubCacheDir,
+        dartdocVersion: 'any',
+      ),
+    );
   });
 
   tearDownAll(() async {
@@ -29,15 +31,21 @@ void main() {
   });
 
   void verifyPackage(String package) {
-    test('end2end light: $package', () async {
-      final summary = await analyzer.inspectPackage(package);
-      expect(summary.report, isNotNull);
-      expect(summary.allDependencies!, isNotEmpty);
-      expect(summary.tags!, isNotEmpty);
-      expect(summary.tags, contains('is:dart3-compatible'));
-      expect(summary.report!.grantedPoints,
-          greaterThanOrEqualTo(summary.report!.maxPoints - 20));
-    }, timeout: const Timeout.factor(2));
+    test(
+      'end2end light: $package',
+      () async {
+        final summary = await analyzer.inspectPackage(package);
+        expect(summary.report, isNotNull);
+        expect(summary.allDependencies!, isNotEmpty);
+        expect(summary.tags!, isNotEmpty);
+        expect(summary.tags, contains('is:dart3-compatible'));
+        expect(
+          summary.report!.grantedPoints,
+          greaterThanOrEqualTo(summary.report!.maxPoints - 20),
+        );
+      },
+      timeout: const Timeout.factor(2),
+    );
   }
 
   // generic, cross-platform package

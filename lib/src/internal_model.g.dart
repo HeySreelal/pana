@@ -24,7 +24,8 @@ OutdatedPackage _$OutdatedPackageFromJson(Map<String, dynamic> json) =>
       json['upgradable'] == null
           ? null
           : VersionDescriptor.fromJson(
-              json['upgradable'] as Map<String, dynamic>),
+              json['upgradable'] as Map<String, dynamic>,
+            ),
       json['latest'] == null
           ? null
           : VersionDescriptor.fromJson(json['latest'] as Map<String, dynamic>),

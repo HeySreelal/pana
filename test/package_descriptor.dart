@@ -7,18 +7,20 @@ import 'dart:convert';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
 /// Convenience for creating a descriptor of a package.
-d.DirectoryDescriptor packageWithPathDeps(String name,
-    {String? sdkConstraint,
-    List<String> dependencies = const [],
-    List<d.Descriptor> lib = const [],
-    Map pubspecExtras = const {},
-    List<d.Descriptor> extraFiles = const []}) {
+d.DirectoryDescriptor packageWithPathDeps(
+  String name, {
+  String? sdkConstraint,
+  List<String> dependencies = const [],
+  List<d.Descriptor> lib = const [],
+  Map pubspecExtras = const {},
+  List<d.Descriptor> extraFiles = const [],
+}) {
   final pubspec = json.encode(
     {
       'name': name,
       if (sdkConstraint != null) 'environment': {'sdk': sdkConstraint},
       'dependencies': {
-        for (final dep in dependencies) dep: {'path': '../$dep'}
+        for (final dep in dependencies) dep: {'path': '../$dep'},
       },
       ...pubspecExtras,
     },
@@ -53,12 +55,14 @@ d.DirectoryDescriptor packageWithPathDeps(String name,
 }
 
 /// Convenience for creating a descriptor of a package.
-d.DirectoryDescriptor package(String name,
-    {String? sdkConstraint,
-    Map<String, Object> dependencies = const {},
-    List<d.Descriptor> lib = const [],
-    Map pubspecExtras = const {},
-    List<d.Descriptor> extraFiles = const []}) {
+d.DirectoryDescriptor package(
+  String name, {
+  String? sdkConstraint,
+  Map<String, Object> dependencies = const {},
+  List<d.Descriptor> lib = const [],
+  Map pubspecExtras = const {},
+  List<d.Descriptor> extraFiles = const [],
+}) {
   final pubspec = json.encode(
     {
       'name': name,

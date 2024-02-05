@@ -92,7 +92,10 @@ import '_specs.dart';
 
 /// Detects forbidden imports given a runtime.
 PathFinder<Uri> runtimeViolationFinder(
-    LibraryGraph libraryGraph, Runtime runtime, Explainer<Uri> explainer) {
+  LibraryGraph libraryGraph,
+  Runtime runtime,
+  Explainer<Uri> explainer,
+) {
   return PathFinder<Uri>(libraryGraph, (Uri uri) {
     final uriString = uri.toString();
     if (uriString.startsWith('dart:') &&
@@ -232,14 +235,17 @@ class SdkViolationFinder {
   final Sdk sdk;
   final AnalysisSession _session;
 
-  SdkViolationFinder(PackageGraph packageGraph, this.sdk,
-      PubspecCache pubspecCache, this._session)
-      : _declaredSdkViolationFinder = PathFinder(
+  SdkViolationFinder(
+    PackageGraph packageGraph,
+    this.sdk,
+    PubspecCache pubspecCache,
+    this._session,
+  ) : _declaredSdkViolationFinder = PathFinder(
           packageGraph,
           (String packageDir) {
             final declaredSdks = {
               ...pubspecCache.pubspecOfPackage(packageDir).dependentSdks,
-              'dart'
+              'dart',
             };
             final nonAllowedSdks =
                 declaredSdks.difference(sdk.allowedSdks.toSet());

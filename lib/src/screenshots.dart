@@ -63,7 +63,9 @@ class ScreenshotResult {
 }
 
 Future<List<ScreenshotResult>> processAllScreenshots(
-    List<p.Screenshot> screenshots, String pkgDir) async {
+  List<p.Screenshot> screenshots,
+  String pkgDir,
+) async {
   final tempDir = Directory.systemTemp.createTempSync();
   try {
     final results = <ScreenshotResult>[];
@@ -71,11 +73,13 @@ Future<List<ScreenshotResult>> processAllScreenshots(
     for (final screenshot in screenshots) {
       final problems = <String>[];
       if (processedScreenshots == maxNumberOfScreenshots) {
-        results.add(ScreenshotResult.failed(
-          [
-            '${screenshot.path}: Not processed. pub.dev shows at most $maxNumberOfScreenshots screenshots.'
-          ],
-        ));
+        results.add(
+          ScreenshotResult.failed(
+            [
+              '${screenshot.path}: Not processed. pub.dev shows at most $maxNumberOfScreenshots screenshots.',
+            ],
+          ),
+        );
         continue;
       }
 
@@ -101,7 +105,8 @@ List<String> _validateScreenshot(p.Screenshot screenshot, String pkgDir) {
   final problems = <String>[];
   if (screenshot.description.isEmpty) {
     problems.add(
-        '${screenshot.path}: Screenshot `description` property is missing.');
+      '${screenshot.path}: Screenshot `description` property is missing.',
+    );
   } else if (screenshot.description.length > 160) {
     problems.add(
         '${screenshot.path}: Screenshot `description` is too long. Description length must be less '
@@ -114,22 +119,28 @@ List<String> _validateScreenshot(p.Screenshot screenshot, String pkgDir) {
   final fullPath = path.join(pkgDir, screenshot.path);
   if (!path.isWithin(pkgDir, fullPath)) {
     problems.add(
-        '${screenshot.path}: Screenshot file path should be within the package.');
+      '${screenshot.path}: Screenshot file path should be within the package.',
+    );
   }
 
   final origImage = File(fullPath);
   if (!origImage.existsSync()) {
     problems.add(
-        '${screenshot.path}: No file found at specified screenshot `path` ${screenshot.path}');
+      '${screenshot.path}: No file found at specified screenshot `path` ${screenshot.path}',
+    );
   } else if (origImage.lengthSync() > maxFileSizeInBytes) {
     problems.add(
-        '${screenshot.path}: Screenshot file size exceeds limit of $maxFileSizeInMegaBytes MB');
+      '${screenshot.path}: Screenshot file size exceeds limit of $maxFileSizeInMegaBytes MB',
+    );
   }
   return problems;
 }
 
 Future<ScreenshotResult> _processScreenshot(
-    String pkgDir, p.Screenshot e, String tempDir) async {
+  String pkgDir,
+  p.Screenshot e,
+  String tempDir,
+) async {
   final basename = path.basenameWithoutExtension(e.path);
   final webpName = '$basename.webp';
   final genDir = 'gen';
@@ -166,12 +177,15 @@ Future<ScreenshotResult> _processScreenshot(
   }
 
   return ScreenshotResult.success(
-    ProcessedScreenshot(e.path, e.description,
-        webpImage: webpPath,
-        webp100Thumbnail: webp100ThumbnailPath,
-        png100Thumbnail: png100ThumbnailPath,
-        webp190Thumbnail: webp190ThumbnailPath,
-        png190Thumbnail: png190ThumbnailPath),
+    ProcessedScreenshot(
+      e.path,
+      e.description,
+      webpImage: webpPath,
+      webp100Thumbnail: webp100ThumbnailPath,
+      png100Thumbnail: png100ThumbnailPath,
+      webp190Thumbnail: webp190ThumbnailPath,
+      png190Thumbnail: png190ThumbnailPath,
+    ),
     File(path.join(tempDir, webpPath)).readAsBytesSync(),
     File(path.join(tempDir, webp100ThumbnailPath)).readAsBytesSync(),
     File(path.join(tempDir, png100ThumbnailPath)).readAsBytesSync(),
@@ -223,12 +237,15 @@ Future<List<String>> _generateWebpScreenshot(
   }
   problems.addAll(gif2webpProblems);
   problems.add(
-      'Generating webp image for $originalPath failed due to invalid input');
+    'Generating webp image for $originalPath failed due to invalid input',
+  );
   return problems;
 }
 
 Future<List<String>> _copyIfAlreadyWebp(
-    String originalPath, String webpPath) async {
+  String originalPath,
+  String webpPath,
+) async {
   return await _checkedRunProc(
     ['webpinfo', originalPath],
     failureText:
@@ -240,7 +257,9 @@ Future<List<String>> _copyIfAlreadyWebp(
 }
 
 Future<List<String>> _convertWithCWebp(
-    String originalPath, String webpPath) async {
+  String originalPath,
+  String webpPath,
+) async {
   return await _checkedRunProc(
     ['cwebp', originalPath, '-o', webpPath],
     failureText:
@@ -249,7 +268,9 @@ Future<List<String>> _convertWithCWebp(
 }
 
 Future<List<String>> _convertGifToWebp(
-    String originalPath, String webpPath) async {
+  String originalPath,
+  String webpPath,
+) async {
   return await _checkedRunProc(
     ['gif2webp', originalPath, '-o', webpPath],
     failureText:
@@ -274,13 +295,14 @@ Future<List<String>> _convertGifToWebp(
 /// Thumbnail generation will fail if any of the mentioned tools are not
 /// available on the command line and an error message will be written to stderr.
 Future<List<String>> _generateThumbnails(
-    String originalPath,
-    String webpPath,
-    String webp100ThumbnailPath,
-    String png100ThumbnailPath,
-    String webp190ThumbnailPath,
-    String png190ThumbnailPath,
-    String tempDir) async {
+  String originalPath,
+  String webpPath,
+  String webp100ThumbnailPath,
+  String png100ThumbnailPath,
+  String webp190ThumbnailPath,
+  String png190ThumbnailPath,
+  String tempDir,
+) async {
   late String staticWebpPath;
   late String infoOutput;
   final infoResult = await _checkedRunProc(
@@ -347,7 +369,7 @@ Future<List<String>> _generateThumbnails(
         '$heightArgument',
         originalPath,
         '-o',
-        outputPath
+        outputPath,
       ],
       failureText:
           '`$originalPath`: Resizing to WebP thumbnail with `cwebp -resize $widthArgument $heightArgument "$staticWebpPath" -o "$outputPath"`',
@@ -355,12 +377,22 @@ Future<List<String>> _generateThumbnails(
   }
 
   final resizeWebp100Result = await resizeWebp(
-      staticWebpPath, width, height, 100, webp100ThumbnailPath);
+    staticWebpPath,
+    width,
+    height,
+    100,
+    webp100ThumbnailPath,
+  );
   if (resizeWebp100Result.isNotEmpty) {
     return resizeWebp100Result;
   }
   final resizeWebp190Result = await resizeWebp(
-      staticWebpPath, width, height, 190, webp190ThumbnailPath);
+    staticWebpPath,
+    width,
+    height,
+    190,
+    webp190ThumbnailPath,
+  );
   if (resizeWebp190Result.isNotEmpty) {
     return resizeWebp190Result;
   }

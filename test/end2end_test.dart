@@ -37,12 +37,14 @@ void main() {
       httpClient: httpClient,
       blockPublishAfter: goldenDirLastModified,
     );
-    analyzer = PackageAnalyzer(await ToolEnvironment.create(
-      pubCacheDir: pubCacheDir,
-      panaCacheDir: panaCacheDir,
-      pubHostedUrl: 'http://127.0.0.1:${httpServer.port}',
-      dartdocVersion: 'any',
-    ));
+    analyzer = PackageAnalyzer(
+      await ToolEnvironment.create(
+        pubCacheDir: pubCacheDir,
+        panaCacheDir: panaCacheDir,
+        pubHostedUrl: 'http://127.0.0.1:${httpServer.port}',
+        dartdocVersion: 'any',
+      ),
+    );
   });
 
   tearDownAll(() async {
@@ -57,124 +59,140 @@ void main() {
     bool skipDartdoc = false,
   }) {
     final filename = '$package-$version.json';
-    group('end2end: $package $version', () {
-      Map<String, dynamic>? actualMap;
+    group(
+      'end2end: $package $version',
+      () {
+        Map<String, dynamic>? actualMap;
 
-      setUpAll(() async {
-        final dartdocOutputDir = p.join(tempDir, 'doc', '$package-version');
-        await Directory(dartdocOutputDir).create(recursive: true);
+        setUpAll(() async {
+          final dartdocOutputDir = p.join(tempDir, 'doc', '$package-version');
+          await Directory(dartdocOutputDir).create(recursive: true);
 
-        var summary = await analyzer.inspectPackage(
-          package,
-          version: version,
-          options: InspectOptions(
-            pubHostedUrl: 'http://127.0.0.1:${httpServer.port}',
-            dartdocOutputDir: skipDartdoc ? null : dartdocOutputDir,
-          ),
-        );
+          var summary = await analyzer.inspectPackage(
+            package,
+            version: version,
+            options: InspectOptions(
+              pubHostedUrl: 'http://127.0.0.1:${httpServer.port}',
+              dartdocOutputDir: skipDartdoc ? null : dartdocOutputDir,
+            ),
+          );
 
-        // Fixed version strings to reduce changes on each upgrades.
-        assert(summary.runtimeInfo.panaVersion == packageVersion);
-        final sdkVersion = summary.runtimeInfo.sdkVersion;
-        final flutterDartVersion =
-            summary.runtimeInfo.flutterInternalDartSdkVersion;
-        summary = summary.change(
-          createdAt: DateTime.utc(2022, 11, 23, 11, 09),
-          runtimeInfo: PanaRuntimeInfo(
-            panaVersion: '{{pana-version}}',
-            sdkVersion: '{{sdk-version}}',
-            flutterVersions: {},
-          ),
-        );
+          // Fixed version strings to reduce changes on each upgrades.
+          assert(summary.runtimeInfo.panaVersion == packageVersion);
+          final sdkVersion = summary.runtimeInfo.sdkVersion;
+          final flutterDartVersion =
+              summary.runtimeInfo.flutterInternalDartSdkVersion;
+          summary = summary.change(
+            createdAt: DateTime.utc(2022, 11, 23, 11, 09),
+            runtimeInfo: PanaRuntimeInfo(
+              panaVersion: '{{pana-version}}',
+              sdkVersion: '{{sdk-version}}',
+              flutterVersions: {},
+            ),
+          );
 
-        // summary.toJson contains types which are not directly JSON-able
-        // throwing it through `JSON.encode` does the trick
-        final encoded = json.encode(summary);
-        final updated = encoded
-            .replaceAll(
-                '"sdkVersion":"$sdkVersion"', '"sdkVersion":"{{sdk-version}}"')
-            .replaceAll('The current Dart SDK version is $sdkVersion.',
-                'The current Dart SDK version is {{sdk-version}}.')
-            .replaceAll(' support current Dart version $sdkVersion.',
-                ' support current Dart version {{sdk-version}}.')
-            .replaceAll(
-                'the Dart version used by the latest stable Flutter ($flutterDartVersion)',
-                'the Dart version used by the latest stable Flutter ({{flutter-dart-version}})')
-            .replaceAll(RegExp('that was published [0-9]+ days ago'),
-                'that was published N days ago');
-        actualMap = json.decode(updated) as Map<String, dynamic>?;
-      });
-
-      test('matches known good', () {
-        void removeDependencyDetails(Map map) {
-          if (map.containsKey('pkgResolution') &&
-              (map['pkgResolution'] as Map).containsKey('dependencies')) {
-            final deps = (map['pkgResolution']['dependencies'] as List)
-                .cast<Map<dynamic, dynamic>>();
-            for (final m in deps) {
-              m.remove('resolved');
-              m.remove('available');
-            }
-          }
-        }
-
-        // Reduce the time-invariability of the tests: resolved and available
-        // versions may change over time or because of SDK version changes.
-        removeDependencyDetails(actualMap!);
-
-        final json =
-            '${const JsonEncoder.withIndent('  ').convert(actualMap)}\n';
-
-        // The tempdir creeps in to an error message.
-        final jsonNoTempDir = json.replaceAll(
-            RegExp(r'Error on line 5, column 1 of .*pubspec.yaml'),
-            r'Error on line 5, column 1 of $TEMPDIR/pubspec.yaml');
-
-        expectMatchesGoldenFile(jsonNoTempDir, p.join(_goldenDir, filename));
-      });
-
-      test('Report matches known good', () {
-        final jsonReport = actualMap!['report'] as Map<String, dynamic>?;
-        if (jsonReport != null) {
-          final report = Report.fromJson(jsonReport);
-          final renderedSections = report.sections
-              .map(
-                (s) =>
-                    '## ${s.grantedPoints}/${s.maxPoints} ${s.title}\n\n${s.summary}',
+          // summary.toJson contains types which are not directly JSON-able
+          // throwing it through `JSON.encode` does the trick
+          final encoded = json.encode(summary);
+          final updated = encoded
+              .replaceAll(
+                '"sdkVersion":"$sdkVersion"',
+                '"sdkVersion":"{{sdk-version}}"',
               )
-              .join('\n\n');
-          // For readability we output the report in its own file.
-          expectMatchesGoldenFile(
-              renderedSections, p.join(_goldenDir, '${filename}_report.md'));
-        }
-      });
+              .replaceAll(
+                'The current Dart SDK version is $sdkVersion.',
+                'The current Dart SDK version is {{sdk-version}}.',
+              )
+              .replaceAll(
+                ' support current Dart version $sdkVersion.',
+                ' support current Dart version {{sdk-version}}.',
+              )
+              .replaceAll(
+                'the Dart version used by the latest stable Flutter ($flutterDartVersion)',
+                'the Dart version used by the latest stable Flutter ({{flutter-dart-version}})',
+              )
+              .replaceAll(
+                RegExp('that was published [0-9]+ days ago'),
+                'that was published N days ago',
+              );
+          actualMap = json.decode(updated) as Map<String, dynamic>?;
+        });
 
-      test('Summary can round-trip', () {
-        var summary = Summary.fromJson(actualMap!);
-
-        var roundTrip = json.decode(json.encode(summary));
-        expect(roundTrip, actualMap);
-      });
-
-      test('Summary tags check', () {
-        final tagsFileContent =
-            File('lib/src/tag/pana_tags.dart').readAsStringSync();
-        final summary = Summary.fromJson(actualMap!);
-        final tags = summary.tags;
-        if (tags != null) {
-          for (final tag in tags) {
-            if (tagsFileContent.contains("'$tag'")) {
-              continue;
+        test('matches known good', () {
+          void removeDependencyDetails(Map map) {
+            if (map.containsKey('pkgResolution') &&
+                (map['pkgResolution'] as Map).containsKey('dependencies')) {
+              final deps = (map['pkgResolution']['dependencies'] as List)
+                  .cast<Map<dynamic, dynamic>>();
+              for (final m in deps) {
+                m.remove('resolved');
+                m.remove('available');
+              }
             }
-            if (tag.startsWith('license:')) {
-              // SPDX license tags are skipped
-              continue;
-            }
-            fail('Unexpected tag in the result: "$tag"');
           }
-        }
-      });
-    }, timeout: const Timeout.factor(2));
+
+          // Reduce the time-invariability of the tests: resolved and available
+          // versions may change over time or because of SDK version changes.
+          removeDependencyDetails(actualMap!);
+
+          final json =
+              '${const JsonEncoder.withIndent('  ').convert(actualMap)}\n';
+
+          // The tempdir creeps in to an error message.
+          final jsonNoTempDir = json.replaceAll(
+            RegExp(r'Error on line 5, column 1 of .*pubspec.yaml'),
+            r'Error on line 5, column 1 of $TEMPDIR/pubspec.yaml',
+          );
+
+          expectMatchesGoldenFile(jsonNoTempDir, p.join(_goldenDir, filename));
+        });
+
+        test('Report matches known good', () {
+          final jsonReport = actualMap!['report'] as Map<String, dynamic>?;
+          if (jsonReport != null) {
+            final report = Report.fromJson(jsonReport);
+            final renderedSections = report.sections
+                .map(
+                  (s) =>
+                      '## ${s.grantedPoints}/${s.maxPoints} ${s.title}\n\n${s.summary}',
+                )
+                .join('\n\n');
+            // For readability we output the report in its own file.
+            expectMatchesGoldenFile(
+              renderedSections,
+              p.join(_goldenDir, '${filename}_report.md'),
+            );
+          }
+        });
+
+        test('Summary can round-trip', () {
+          var summary = Summary.fromJson(actualMap!);
+
+          var roundTrip = json.decode(json.encode(summary));
+          expect(roundTrip, actualMap);
+        });
+
+        test('Summary tags check', () {
+          final tagsFileContent =
+              File('lib/src/tag/pana_tags.dart').readAsStringSync();
+          final summary = Summary.fromJson(actualMap!);
+          final tags = summary.tags;
+          if (tags != null) {
+            for (final tag in tags) {
+              if (tagsFileContent.contains("'$tag'")) {
+                continue;
+              }
+              if (tag.startsWith('license:')) {
+                // SPDX license tags are skipped
+                continue;
+              }
+              fail('Unexpected tag in the result: "$tag"');
+            }
+          }
+        });
+      },
+      timeout: const Timeout.factor(2),
+    );
   }
 
   // generic, cross-platform package

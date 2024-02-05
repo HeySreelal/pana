@@ -46,7 +46,8 @@ Repository parseRepositoryUrl(String input) {
   final normalizedUri = Uri.parse(p.normalize(uri.path));
   if (uri.path != normalizedUri.path && uri.path != '${normalizedUri.path}/') {
     throw FormatException(
-        'URL path is not normalized: `${uri.path}` != `${normalizedUri.path}`');
+      'URL path is not normalized: `${uri.path}` != `${normalizedUri.path}`',
+    );
   }
   // detect repo vs path segments
   final segments =

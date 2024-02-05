@@ -16,7 +16,7 @@ void testDiffMain() {
   expected = [
     Diff(Operation.equal, 'ab'),
     Diff(Operation.insert, '123'),
-    Diff(Operation.equal, 'c')
+    Diff(Operation.equal, 'c'),
   ];
 
   _testDiffMain(
@@ -29,7 +29,7 @@ void testDiffMain() {
   expected = [
     Diff(Operation.equal, 'a'),
     Diff(Operation.delete, '123'),
-    Diff(Operation.equal, 'bc')
+    Diff(Operation.equal, 'bc'),
   ];
 
   _testDiffMain(
@@ -44,7 +44,7 @@ void testDiffMain() {
     Diff(Operation.insert, '123'),
     Diff(Operation.equal, 'b'),
     Diff(Operation.insert, '456'),
-    Diff(Operation.equal, 'c')
+    Diff(Operation.equal, 'c'),
   ];
 
   _testDiffMain(
@@ -59,7 +59,7 @@ void testDiffMain() {
     Diff(Operation.delete, '123'),
     Diff(Operation.equal, 'b'),
     Diff(Operation.delete, '456'),
-    Diff(Operation.equal, 'c')
+    Diff(Operation.equal, 'c'),
   ];
 
   _testDiffMain(
@@ -89,7 +89,7 @@ void testDiffMain() {
     Diff(Operation.insert, 'Banana'),
     Diff(Operation.equal, 's are a'),
     Diff(Operation.insert, 'lso'),
-    Diff(Operation.equal, ' fruit.')
+    Diff(Operation.equal, ' fruit.'),
   ];
 
   _testDiffMain(
@@ -120,7 +120,7 @@ void testDiffMain() {
     Diff(Operation.delete, 'y'),
     Diff(Operation.equal, 'b'),
     Diff(Operation.delete, '2'),
-    Diff(Operation.insert, 'xab')
+    Diff(Operation.insert, 'xab'),
   ];
 
   _testDiffMain(
@@ -133,7 +133,7 @@ void testDiffMain() {
   expected = [
     Diff(Operation.insert, 'xaxcx'),
     Diff(Operation.equal, 'abc'),
-    Diff(Operation.delete, 'y')
+    Diff(Operation.delete, 'y'),
   ];
 
   _testDiffMain(
@@ -152,7 +152,7 @@ void testDiffMain() {
     Diff(Operation.delete, '='),
     Diff(Operation.insert, '-'),
     Diff(Operation.equal, 'efghijklmnopqrs'),
-    Diff(Operation.delete, 'EFGHIJKLMNOefg')
+    Diff(Operation.delete, 'EFGHIJKLMNOefg'),
   ];
 
   _testDiffMain(
@@ -167,7 +167,7 @@ void testDiffMain() {
     Diff(Operation.equal, 'a'),
     Diff(Operation.insert, 'nd'),
     Diff(Operation.equal, ' [[Pennsylvania]]'),
-    Diff(Operation.delete, ' and [[')
+    Diff(Operation.delete, ' and [['),
   ];
 
   _testDiffMain(
@@ -228,15 +228,19 @@ void testDiffMain() {
   b = 'abcdefghij\n1234567890\n1234567890\n1234567890\nabcdefghij\n1234567890\n1234567890\n1234567890\nabcdefghij\n1234567890\n1234567890\n1234567890\nabcdefghij\n';
 
   test('diff_main: Overlap mode', () {
-    final textsLineMode = diffRebuildtexts(diffMain(
-      a,
-      b,
-      checklines: true,
-    ));
-    final textsTextMode = diffRebuildtexts(diffMain(
-      a,
-      b,
-    ));
+    final textsLineMode = diffRebuildtexts(
+      diffMain(
+        a,
+        b,
+        checklines: true,
+      ),
+    );
+    final textsTextMode = diffRebuildtexts(
+      diffMain(
+        a,
+        b,
+      ),
+    );
 
     expect(textsLineMode.length, textsTextMode.length);
     expect(textsLineMode[0], textsTextMode[0]);
@@ -430,7 +434,7 @@ void testDiffLineToChars() {
       {
         'chars1': '\u0001\u0002\u0001',
         'chars2': '\u0002\u0001\u0002',
-        'lineArray': ['', 'alpha\n', 'beta\n']
+        'lineArray': ['', 'alpha\n', 'beta\n'],
       },
     );
 
@@ -441,14 +445,14 @@ void testDiffLineToChars() {
       {
         'chars1': '',
         'chars2': '\u0001\u0002\u0003\u0003',
-        'lineArray': ['', 'alpha\r\n', 'beta\r\n', '\r\n']
+        'lineArray': ['', 'alpha\r\n', 'beta\r\n', '\r\n'],
       },
     );
 
     _testDiffLineToChars('No linebreaks.', 'a', 'b', {
       'chars1': '\u0001',
       'chars2': '\u0002',
-      'lineArray': ['', 'a', 'b']
+      'lineArray': ['', 'a', 'b'],
     });
 
     // More than 256 to reveal any 8-bit limitations.
@@ -461,11 +465,12 @@ void testDiffLineToChars() {
       charList.writeCharCode(i);
     }
     test(
-        'Test initialization fail #1.',
-        () => expect(
-              lineList.length,
-              isNot(n),
-            ));
+      'Test initialization fail #1.',
+      () => expect(
+        lineList.length,
+        isNot(n),
+      ),
+    );
 
     var lines = lineList.join();
     var chars = charList.toString();
@@ -488,7 +493,7 @@ void testDiffCharsToLines() {
   group('diff_CharsToLines:', () {
     var diffs = [
       Diff(Operation.equal, '\u0001\u0002\u0001'),
-      Diff(Operation.insert, '\u0002\u0001\u0002')
+      Diff(Operation.insert, '\u0002\u0001\u0002'),
     ];
 
     _testDiffCharsToLines(
@@ -497,7 +502,7 @@ void testDiffCharsToLines() {
       ['', 'alpha\n', 'beta\n'],
       [
         Diff(Operation.equal, 'alpha\nbeta\nalpha\n'),
-        Diff(Operation.insert, 'beta\nalpha\nbeta\n')
+        Diff(Operation.insert, 'beta\nalpha\nbeta\n'),
       ],
     );
     // More than 256 to reveal any 8-bit limitations.
@@ -510,20 +515,22 @@ void testDiffCharsToLines() {
       charList.writeCharCode(i);
     }
     test(
-        'Test initialization fail #3.',
-        () => expect(
-              lineList.length,
-              isNot(n),
-            ));
+      'Test initialization fail #3.',
+      () => expect(
+        lineList.length,
+        isNot(n),
+      ),
+    );
 
     var lines = lineList.join();
     var chars = charList.toString();
     test(
-        'Test initialization fail #4',
-        () => expect(
-              n,
-              isNot(chars.length),
-            ));
+      'Test initialization fail #4',
+      () => expect(
+        n,
+        isNot(chars.length),
+      ),
+    );
 
     lineList.insert(0, '');
 
@@ -558,19 +565,19 @@ void testDiffCleanupMerge() {
     actual = [
       Diff(Operation.equal, 'a'),
       Diff(Operation.delete, 'b'),
-      Diff(Operation.insert, 'c')
+      Diff(Operation.insert, 'c'),
     ];
 
     _testDiffCleanupMerge('No change case.', actual, [
       Diff(Operation.equal, 'a'),
       Diff(Operation.delete, 'b'),
-      Diff(Operation.insert, 'c')
+      Diff(Operation.insert, 'c'),
     ]);
 
     actual = [
       Diff(Operation.equal, 'a'),
       Diff(Operation.equal, 'b'),
-      Diff(Operation.equal, 'c')
+      Diff(Operation.equal, 'c'),
     ];
 
     _testDiffCleanupMerge(
@@ -582,7 +589,7 @@ void testDiffCleanupMerge() {
     actual = [
       Diff(Operation.delete, 'a'),
       Diff(Operation.delete, 'b'),
-      Diff(Operation.delete, 'c')
+      Diff(Operation.delete, 'c'),
     ];
 
     _testDiffCleanupMerge(
@@ -594,7 +601,7 @@ void testDiffCleanupMerge() {
     actual = [
       Diff(Operation.insert, 'a'),
       Diff(Operation.insert, 'b'),
-      Diff(Operation.insert, 'c')
+      Diff(Operation.insert, 'c'),
     ];
 
     _testDiffCleanupMerge(
@@ -609,7 +616,7 @@ void testDiffCleanupMerge() {
       Diff(Operation.delete, 'c'),
       Diff(Operation.insert, 'd'),
       Diff(Operation.equal, 'e'),
-      Diff(Operation.equal, 'f')
+      Diff(Operation.equal, 'f'),
     ];
 
     _testDiffCleanupMerge(
@@ -618,14 +625,14 @@ void testDiffCleanupMerge() {
       [
         Diff(Operation.delete, 'ac'),
         Diff(Operation.insert, 'bd'),
-        Diff(Operation.equal, 'ef')
+        Diff(Operation.equal, 'ef'),
       ],
     );
 
     actual = [
       Diff(Operation.delete, 'a'),
       Diff(Operation.insert, 'abc'),
-      Diff(Operation.delete, 'dc')
+      Diff(Operation.delete, 'dc'),
     ];
 
     _testDiffCleanupMerge(
@@ -635,7 +642,7 @@ void testDiffCleanupMerge() {
         Diff(Operation.equal, 'a'),
         Diff(Operation.delete, 'd'),
         Diff(Operation.insert, 'b'),
-        Diff(Operation.equal, 'c')
+        Diff(Operation.equal, 'c'),
       ],
     );
 
@@ -644,7 +651,7 @@ void testDiffCleanupMerge() {
       Diff(Operation.delete, 'a'),
       Diff(Operation.insert, 'abc'),
       Diff(Operation.delete, 'dc'),
-      Diff(Operation.equal, 'y')
+      Diff(Operation.equal, 'y'),
     ];
 
     _testDiffCleanupMerge(
@@ -654,14 +661,14 @@ void testDiffCleanupMerge() {
         Diff(Operation.equal, 'xa'),
         Diff(Operation.delete, 'd'),
         Diff(Operation.insert, 'b'),
-        Diff(Operation.equal, 'cy')
+        Diff(Operation.equal, 'cy'),
       ],
     );
 
     actual = [
       Diff(Operation.equal, 'a'),
       Diff(Operation.insert, 'ba'),
-      Diff(Operation.equal, 'c')
+      Diff(Operation.equal, 'c'),
     ];
 
     _testDiffCleanupMerge(
@@ -673,7 +680,7 @@ void testDiffCleanupMerge() {
     actual = [
       Diff(Operation.equal, 'c'),
       Diff(Operation.insert, 'ab'),
-      Diff(Operation.equal, 'a')
+      Diff(Operation.equal, 'a'),
     ];
 
     _testDiffCleanupMerge(
@@ -687,7 +694,7 @@ void testDiffCleanupMerge() {
       Diff(Operation.delete, 'b'),
       Diff(Operation.equal, 'c'),
       Diff(Operation.delete, 'ac'),
-      Diff(Operation.equal, 'x')
+      Diff(Operation.equal, 'x'),
     ];
 
     _testDiffCleanupMerge(
@@ -701,7 +708,7 @@ void testDiffCleanupMerge() {
       Diff(Operation.delete, 'ca'),
       Diff(Operation.equal, 'c'),
       Diff(Operation.delete, 'b'),
-      Diff(Operation.equal, 'a')
+      Diff(Operation.equal, 'a'),
     ];
 
     _testDiffCleanupMerge(
@@ -713,7 +720,7 @@ void testDiffCleanupMerge() {
     actual = [
       Diff(Operation.delete, 'b'),
       Diff(Operation.insert, 'ab'),
-      Diff(Operation.equal, 'c')
+      Diff(Operation.equal, 'c'),
     ];
 
     _testDiffCleanupMerge(
@@ -725,7 +732,7 @@ void testDiffCleanupMerge() {
     actual = [
       Diff(Operation.equal, ''),
       Diff(Operation.insert, 'a'),
-      Diff(Operation.equal, 'b')
+      Diff(Operation.equal, 'b'),
     ];
 
     _testDiffCleanupMerge(
@@ -744,19 +751,19 @@ void testDiffCleanupSemanticLosses() {
     actual = [
       Diff(Operation.equal, 'AAA\r\n\r\nBBB'),
       Diff(Operation.insert, '\r\nDDD\r\n\r\nBBB'),
-      Diff(Operation.equal, '\r\nEEE')
+      Diff(Operation.equal, '\r\nEEE'),
     ];
 
     _testDiffCleanupSemanticLosses('Blank lines.', actual, [
       Diff(Operation.equal, 'AAA\r\n\r\n'),
       Diff(Operation.insert, 'BBB\r\nDDD\r\n\r\n'),
-      Diff(Operation.equal, 'BBB\r\nEEE')
+      Diff(Operation.equal, 'BBB\r\nEEE'),
     ]);
 
     actual = [
       Diff(Operation.equal, 'AAA\r\nBBB'),
       Diff(Operation.insert, ' DDD\r\nBBB'),
-      Diff(Operation.equal, ' EEE')
+      Diff(Operation.equal, ' EEE'),
     ];
 
     _testDiffCleanupSemanticLosses(
@@ -765,14 +772,14 @@ void testDiffCleanupSemanticLosses() {
       [
         Diff(Operation.equal, 'AAA\r\n'),
         Diff(Operation.insert, 'BBB DDD\r\n'),
-        Diff(Operation.equal, 'BBB EEE')
+        Diff(Operation.equal, 'BBB EEE'),
       ],
     );
 
     actual = [
       Diff(Operation.equal, 'The c'),
       Diff(Operation.insert, 'ow and the c'),
-      Diff(Operation.equal, 'at.')
+      Diff(Operation.equal, 'at.'),
     ];
 
     _testDiffCleanupSemanticLosses(
@@ -781,14 +788,14 @@ void testDiffCleanupSemanticLosses() {
       [
         Diff(Operation.equal, 'The '),
         Diff(Operation.insert, 'cow and the '),
-        Diff(Operation.equal, 'cat.')
+        Diff(Operation.equal, 'cat.'),
       ],
     );
 
     actual = [
       Diff(Operation.equal, 'The-c'),
       Diff(Operation.insert, 'ow-and-the-c'),
-      Diff(Operation.equal, 'at.')
+      Diff(Operation.equal, 'at.'),
     ];
 
     _testDiffCleanupSemanticLosses(
@@ -797,14 +804,14 @@ void testDiffCleanupSemanticLosses() {
       [
         Diff(Operation.equal, 'The-'),
         Diff(Operation.insert, 'cow-and-the-'),
-        Diff(Operation.equal, 'cat.')
+        Diff(Operation.equal, 'cat.'),
       ],
     );
 
     actual = [
       Diff(Operation.equal, 'a'),
       Diff(Operation.delete, 'a'),
-      Diff(Operation.equal, 'ax')
+      Diff(Operation.equal, 'ax'),
     ];
 
     _testDiffCleanupSemanticLosses(
@@ -816,7 +823,7 @@ void testDiffCleanupSemanticLosses() {
     actual = [
       Diff(Operation.equal, 'xa'),
       Diff(Operation.delete, 'a'),
-      Diff(Operation.equal, 'a')
+      Diff(Operation.equal, 'a'),
     ];
 
     _testDiffCleanupSemanticLosses(
@@ -828,7 +835,7 @@ void testDiffCleanupSemanticLosses() {
     actual = [
       Diff(Operation.equal, 'The xxx. The '),
       Diff(Operation.insert, 'zzz. The '),
-      Diff(Operation.equal, 'yyy.')
+      Diff(Operation.equal, 'yyy.'),
     ];
 
     _testDiffCleanupSemanticLosses(
@@ -837,7 +844,7 @@ void testDiffCleanupSemanticLosses() {
       [
         Diff(Operation.equal, 'The xxx.'),
         Diff(Operation.insert, ' The zzz.'),
-        Diff(Operation.equal, ' The yyy.')
+        Diff(Operation.equal, ' The yyy.'),
       ],
     );
   });
@@ -852,49 +859,59 @@ void testDiffCleanupSemantic() {
       Diff(Operation.delete, 'ab'),
       Diff(Operation.insert, 'cd'),
       Diff(Operation.equal, '12'),
-      Diff(Operation.delete, 'e')
+      Diff(Operation.delete, 'e'),
     ];
-    _testDiffCleanupSemantic([
-      Diff(Operation.delete, 'ab'),
-      Diff(Operation.insert, 'cd'),
-      Diff(Operation.equal, '12'),
-      Diff(Operation.delete, 'e')
-    ], actual, 'No elimination #1.');
+    _testDiffCleanupSemantic(
+      [
+        Diff(Operation.delete, 'ab'),
+        Diff(Operation.insert, 'cd'),
+        Diff(Operation.equal, '12'),
+        Diff(Operation.delete, 'e'),
+      ],
+      actual,
+      'No elimination #1.',
+    );
 
     actual = [
       Diff(Operation.delete, 'abc'),
       Diff(Operation.insert, 'ABC'),
       Diff(Operation.equal, '1234'),
-      Diff(Operation.delete, 'wxyz')
+      Diff(Operation.delete, 'wxyz'),
     ];
-    _testDiffCleanupSemantic([
-      Diff(Operation.delete, 'abc'),
-      Diff(Operation.insert, 'ABC'),
-      Diff(Operation.equal, '1234'),
-      Diff(Operation.delete, 'wxyz')
-    ], actual, 'No elimination #2.');
+    _testDiffCleanupSemantic(
+      [
+        Diff(Operation.delete, 'abc'),
+        Diff(Operation.insert, 'ABC'),
+        Diff(Operation.equal, '1234'),
+        Diff(Operation.delete, 'wxyz'),
+      ],
+      actual,
+      'No elimination #2.',
+    );
 
     actual = [
       Diff(Operation.delete, 'a'),
       Diff(Operation.equal, 'b'),
-      Diff(Operation.delete, 'c')
+      Diff(Operation.delete, 'c'),
     ];
     _testDiffCleanupSemantic(
-        [Diff(Operation.delete, 'abc'), Diff(Operation.insert, 'b')],
-        actual,
-        'Simple elimination.');
+      [Diff(Operation.delete, 'abc'), Diff(Operation.insert, 'b')],
+      actual,
+      'Simple elimination.',
+    );
 
     actual = [
       Diff(Operation.delete, 'ab'),
       Diff(Operation.equal, 'cd'),
       Diff(Operation.delete, 'e'),
       Diff(Operation.equal, 'f'),
-      Diff(Operation.insert, 'g')
+      Diff(Operation.insert, 'g'),
     ];
     _testDiffCleanupSemantic(
-        [Diff(Operation.delete, 'abcdef'), Diff(Operation.insert, 'cdfg')],
-        actual,
-        'Backpass elimination.');
+      [Diff(Operation.delete, 'abcdef'), Diff(Operation.insert, 'cdfg')],
+      actual,
+      'Backpass elimination.',
+    );
 
     actual = [
       Diff(Operation.insert, '1'),
@@ -905,68 +922,86 @@ void testDiffCleanupSemantic() {
       Diff(Operation.insert, '1'),
       Diff(Operation.equal, 'A'),
       Diff(Operation.delete, 'B'),
-      Diff(Operation.insert, '2')
+      Diff(Operation.insert, '2'),
     ];
     _testDiffCleanupSemantic(
-        [Diff(Operation.delete, 'AB_AB'), Diff(Operation.insert, '1A2_1A2')],
-        actual,
-        'Multiple elimination.');
+      [Diff(Operation.delete, 'AB_AB'), Diff(Operation.insert, '1A2_1A2')],
+      actual,
+      'Multiple elimination.',
+    );
 
     actual = [
       Diff(Operation.equal, 'The c'),
       Diff(Operation.delete, 'ow and the c'),
-      Diff(Operation.equal, 'at.')
+      Diff(Operation.equal, 'at.'),
     ];
-    _testDiffCleanupSemantic([
-      Diff(Operation.equal, 'The '),
-      Diff(Operation.delete, 'cow and the '),
-      Diff(Operation.equal, 'cat.')
-    ], actual, 'Word boundaries.');
+    _testDiffCleanupSemantic(
+      [
+        Diff(Operation.equal, 'The '),
+        Diff(Operation.delete, 'cow and the '),
+        Diff(Operation.equal, 'cat.'),
+      ],
+      actual,
+      'Word boundaries.',
+    );
 
     actual = [Diff(Operation.delete, 'abcxx'), Diff(Operation.insert, 'xxdef')];
     _testDiffCleanupSemantic(
-        [Diff(Operation.delete, 'abcxx'), Diff(Operation.insert, 'xxdef')],
-        actual,
-        'No overlap elimination.');
+      [Diff(Operation.delete, 'abcxx'), Diff(Operation.insert, 'xxdef')],
+      actual,
+      'No overlap elimination.',
+    );
 
     actual = [
       Diff(Operation.delete, 'abcxxx'),
-      Diff(Operation.insert, 'xxxdef')
+      Diff(Operation.insert, 'xxxdef'),
     ];
 
-    _testDiffCleanupSemantic([
-      Diff(Operation.delete, 'abc'),
-      Diff(Operation.equal, 'xxx'),
-      Diff(Operation.insert, 'def')
-    ], actual, 'Overlap elimination.');
+    _testDiffCleanupSemantic(
+      [
+        Diff(Operation.delete, 'abc'),
+        Diff(Operation.equal, 'xxx'),
+        Diff(Operation.insert, 'def'),
+      ],
+      actual,
+      'Overlap elimination.',
+    );
 
     actual = [
       Diff(Operation.delete, 'xxxabc'),
-      Diff(Operation.insert, 'defxxx')
+      Diff(Operation.insert, 'defxxx'),
     ];
 
-    _testDiffCleanupSemantic([
-      Diff(Operation.insert, 'def'),
-      Diff(Operation.equal, 'xxx'),
-      Diff(Operation.delete, 'abc')
-    ], actual, 'Reverse overlap elimination.');
+    _testDiffCleanupSemantic(
+      [
+        Diff(Operation.insert, 'def'),
+        Diff(Operation.equal, 'xxx'),
+        Diff(Operation.delete, 'abc'),
+      ],
+      actual,
+      'Reverse overlap elimination.',
+    );
 
     actual = [
       Diff(Operation.delete, 'abcd1212'),
       Diff(Operation.insert, '1212efghi'),
       Diff(Operation.equal, '----'),
       Diff(Operation.delete, 'A3'),
-      Diff(Operation.insert, '3BC')
+      Diff(Operation.insert, '3BC'),
     ];
-    _testDiffCleanupSemantic([
-      Diff(Operation.delete, 'abcd'),
-      Diff(Operation.equal, '1212'),
-      Diff(Operation.insert, 'efghi'),
-      Diff(Operation.equal, '----'),
-      Diff(Operation.delete, 'A'),
-      Diff(Operation.equal, '3'),
-      Diff(Operation.insert, 'BC')
-    ], actual, 'Two overlap eliminations.');
+    _testDiffCleanupSemantic(
+      [
+        Diff(Operation.delete, 'abcd'),
+        Diff(Operation.equal, '1212'),
+        Diff(Operation.insert, 'efghi'),
+        Diff(Operation.equal, '----'),
+        Diff(Operation.delete, 'A'),
+        Diff(Operation.equal, '3'),
+        Diff(Operation.insert, 'BC'),
+      ],
+      actual,
+      'Two overlap eliminations.',
+    );
   });
 }
 
@@ -983,7 +1018,7 @@ void testDiffBisect() {
       Diff(Operation.insert, 'm'),
       Diff(Operation.equal, 'a'),
       Diff(Operation.delete, 't'),
-      Diff(Operation.insert, 'p')
+      Diff(Operation.insert, 'p'),
     ];
     // One year should be sufficient.
     var deadline = DateTime.now().add(const Duration(days: 365));
@@ -1001,7 +1036,7 @@ void testWordDiffLevenshtein() {
   var diffs = [
     Diff(Operation.delete, 'delete three words'),
     Diff(Operation.insert, 'and insert four words'),
-    Diff(Operation.equal, 'xyz')
+    Diff(Operation.equal, 'xyz'),
   ];
 
   _testWordDiffLevenshtein(4, diffs, 'Levenshtein with trailing equality.');
@@ -1009,14 +1044,14 @@ void testWordDiffLevenshtein() {
   diffs = [
     Diff(Operation.equal, 'three equal words'),
     Diff(Operation.delete, 'delete three words'),
-    Diff(Operation.insert, 'insert two')
+    Diff(Operation.insert, 'insert two'),
   ];
   _testWordDiffLevenshtein(3, diffs, 'Levenshtein with leading equality.');
 
   diffs = [
     Diff(Operation.delete, 'delete exact 4 words'),
     Diff(Operation.equal, 'xyz'),
-    Diff(Operation.insert, 'insert two')
+    Diff(Operation.insert, 'insert two'),
   ];
   _testWordDiffLevenshtein(6, diffs, 'Levenshtein with middle equality.');
 }
@@ -1039,11 +1074,12 @@ void _testCommonPrefix(
   int expected,
 ) {
   test(
-      name,
-      () => expect(
-            diffCommonPrefix(text1, text2),
-            expected,
-          ));
+    name,
+    () => expect(
+      diffCommonPrefix(text1, text2),
+      expected,
+    ),
+  );
 }
 
 void _testCommonSuffix(
@@ -1053,11 +1089,12 @@ void _testCommonSuffix(
   int expected,
 ) {
   test(
-      name,
-      () => expect(
-            diffCommonSuffix(text1, text2),
-            expected,
-          ));
+    name,
+    () => expect(
+      diffCommonSuffix(text1, text2),
+      expected,
+    ),
+  );
 }
 
 void _testCommonOverlap(
@@ -1067,11 +1104,12 @@ void _testCommonOverlap(
   int expected,
 ) {
   test(
-      name,
-      () => expect(
-            diffCommonOverlap(text1, text2),
-            expected,
-          ));
+    name,
+    () => expect(
+      diffCommonOverlap(text1, text2),
+      expected,
+    ),
+  );
 }
 
 void _testDiffHalfMatch(
@@ -1136,7 +1174,10 @@ void _testDiffCharsToLines(
 }
 
 void _testDiffCleanupMerge(
-    String name, List<Diff> actual, List<Diff> expected) {
+  String name,
+  List<Diff> actual,
+  List<Diff> expected,
+) {
   test(name, () {
     diffCleanupMerge(actual);
 
@@ -1145,7 +1186,10 @@ void _testDiffCleanupMerge(
 }
 
 void _testDiffCleanupSemanticLosses(
-    String name, List<Diff> actual, List<Diff> expected) {
+  String name,
+  List<Diff> actual,
+  List<Diff> expected,
+) {
   test(name, () {
     diffCleanupSemanticLossless(actual);
 
@@ -1197,7 +1241,7 @@ void testCleanupEfficiency() {
       Diff(Operation.insert, '12'),
       Diff(Operation.equal, 'wxyz'),
       Diff(Operation.delete, 'cd'),
-      Diff(Operation.insert, '34')
+      Diff(Operation.insert, '34'),
     ],
     input: [
       Diff(Operation.delete, 'ab'),
@@ -1212,14 +1256,14 @@ void testCleanupEfficiency() {
     name: 'diff_cleanupEfficiency: Four-edit elimination.',
     expected: [
       Diff(Operation.delete, 'abxyzcd'),
-      Diff(Operation.insert, '12xyz34')
+      Diff(Operation.insert, '12xyz34'),
     ],
     input: [
       Diff(Operation.delete, 'ab'),
       Diff(Operation.insert, '12'),
       Diff(Operation.equal, 'xyz'),
       Diff(Operation.delete, 'cd'),
-      Diff(Operation.insert, '34')
+      Diff(Operation.insert, '34'),
     ],
   );
 
@@ -1230,47 +1274,50 @@ void testCleanupEfficiency() {
       Diff(Operation.insert, '12'),
       Diff(Operation.equal, 'x'),
       Diff(Operation.delete, 'cd'),
-      Diff(Operation.insert, '34')
+      Diff(Operation.insert, '34'),
     ],
   );
 
   _testCleanupEfficiency(
-      name: 'diff_cleanupEfficiency: Backpass elimination.',
-      expected: [
-        Diff(Operation.delete, 'abxyzcd'),
-        Diff(Operation.insert, '12xy34z56')
-      ],
-      input: [
-        Diff(Operation.delete, 'ab'),
-        Diff(Operation.insert, '12'),
-        Diff(Operation.equal, 'xy'),
-        Diff(Operation.insert, '34'),
-        Diff(Operation.equal, 'z'),
-        Diff(Operation.delete, 'cd'),
-        Diff(Operation.insert, '56')
-      ]);
+    name: 'diff_cleanupEfficiency: Backpass elimination.',
+    expected: [
+      Diff(Operation.delete, 'abxyzcd'),
+      Diff(Operation.insert, '12xy34z56'),
+    ],
+    input: [
+      Diff(Operation.delete, 'ab'),
+      Diff(Operation.insert, '12'),
+      Diff(Operation.equal, 'xy'),
+      Diff(Operation.insert, '34'),
+      Diff(Operation.equal, 'z'),
+      Diff(Operation.delete, 'cd'),
+      Diff(Operation.insert, '56'),
+    ],
+  );
 
   _testCleanupEfficiency(
-      name: 'diff_cleanupEfficiency: High cost elimination.',
-      diffEditCost: 5,
-      expected: [
-        Diff(Operation.delete, 'abwxyzcd'),
-        Diff(Operation.insert, '12wxyz34')
-      ],
-      input: [
-        Diff(Operation.delete, 'ab'),
-        Diff(Operation.insert, '12'),
-        Diff(Operation.equal, 'wxyz'),
-        Diff(Operation.delete, 'cd'),
-        Diff(Operation.insert, '34')
-      ]);
+    name: 'diff_cleanupEfficiency: High cost elimination.',
+    diffEditCost: 5,
+    expected: [
+      Diff(Operation.delete, 'abwxyzcd'),
+      Diff(Operation.insert, '12wxyz34'),
+    ],
+    input: [
+      Diff(Operation.delete, 'ab'),
+      Diff(Operation.insert, '12'),
+      Diff(Operation.equal, 'wxyz'),
+      Diff(Operation.delete, 'cd'),
+      Diff(Operation.insert, '34'),
+    ],
+  );
 }
 
-void _testCleanupEfficiency(
-    {required String name,
-    required List<Diff> expected,
-    required List<Diff> input,
-    int diffEditCost = 4}) {
+void _testCleanupEfficiency({
+  required String name,
+  required List<Diff> expected,
+  required List<Diff> input,
+  int diffEditCost = 4,
+}) {
   test(name, () {
     diffCleanupEfficiency(input, diffEditCost: diffEditCost);
     _testOutput(

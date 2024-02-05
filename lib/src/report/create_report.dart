@@ -32,16 +32,18 @@ Future<Report> createReport(PackageContext context) async {
           title: 'Failed to parse the pubspec',
           summary: e.toString(),
           status: ReportStatus.failed,
-        )
+        ),
       ],
     );
   }
 
-  return Report(sections: [
-    await followsTemplate(context),
-    await hasDocumentation(context),
-    await multiPlatform(context.packageDir, pubspec),
-    await staticAnalysis(context),
-    await trustworthyDependency(context),
-  ]);
+  return Report(
+    sections: [
+      await followsTemplate(context),
+      await hasDocumentation(context),
+      await multiPlatform(context.packageDir, pubspec),
+      await staticAnalysis(context),
+      await trustworthyDependency(context),
+    ],
+  );
 }

@@ -65,7 +65,7 @@ Future<ReportSection> staticAnalysis(PackageContext context) async {
         grantedPoints,
         50,
         status,
-      )
+      ),
     ],
     basePath: packageDir,
   );
@@ -102,19 +102,20 @@ Future<_AnalysisResult> _analyzePackage(PackageContext context) async {
     final list = await context.staticAnalysis();
 
     return _AnalysisResult(
-        list
-            .where((element) => element.isError)
-            .map(issueFromCodeProblem)
-            .toList(),
-        list
-            .where((element) => element.isWarning)
-            .map(issueFromCodeProblem)
-            .toList(),
-        list
-            .where((element) => element.isInfo)
-            .map(issueFromCodeProblem)
-            .toList(),
-        'dart analyze ${dirs.join(' ')}');
+      list
+          .where((element) => element.isError)
+          .map(issueFromCodeProblem)
+          .toList(),
+      list
+          .where((element) => element.isWarning)
+          .map(issueFromCodeProblem)
+          .toList(),
+      list
+          .where((element) => element.isInfo)
+          .map(issueFromCodeProblem)
+          .toList(),
+      'dart analyze ${dirs.join(' ')}',
+    );
   } on ToolException catch (e) {
     return _AnalysisResult(
       [
@@ -173,7 +174,11 @@ class _AnalysisResult {
   final String reproductionCommand;
 
   _AnalysisResult(
-      this.errors, this.warnings, this.lints, this.reproductionCommand);
+    this.errors,
+    this.warnings,
+    this.lints,
+    this.reproductionCommand,
+  );
 }
 
 Future<List<Issue>> _formatPackage(
@@ -189,10 +194,12 @@ Future<List<Issue>> _formatPackage(
       lineLength: lineLength,
     );
     return unformattedFiles
-        .map((f) => Issue(
-              '$f doesn\'t match the Dart formatter.',
-              suggestion: 'To format your files run: `dart format .`',
-            ))
+        .map(
+          (f) => Issue(
+            '$f doesn\'t match the Dart formatter.',
+            suggestion: 'To format your files run: `dart format .`',
+          ),
+        )
         .toList();
   } on ToolException catch (e) {
     return [

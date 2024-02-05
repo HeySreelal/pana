@@ -76,17 +76,20 @@ class PackageAnalyzer {
     Logger? logger,
   }) async {
     final sharedContext = _createSharedContext(options: options);
-    return withLogger(() async {
-      return withTempDir((tempDir) async {
-        await downloadPackage(
-          package,
-          version,
-          destination: tempDir,
-          pubHostedUrl: options?.pubHostedUrl,
-        );
-        return await _inspect(sharedContext, tempDir);
-      });
-    }, logger: logger);
+    return withLogger(
+      () async {
+        return withTempDir((tempDir) async {
+          await downloadPackage(
+            package,
+            version,
+            destination: tempDir,
+            pubHostedUrl: options?.pubHostedUrl,
+          );
+          return await _inspect(sharedContext, tempDir);
+        });
+      },
+      logger: logger,
+    );
   }
 
   Future<Summary> inspectDir(String packageDir, {InspectOptions? options}) {
@@ -109,7 +112,9 @@ class PackageAnalyzer {
       );
 
   Future<Summary> _inspect(
-      SharedAnalysisContext sharedContext, String pkgDir) async {
+    SharedAnalysisContext sharedContext,
+    String pkgDir,
+  ) async {
     final tags = <String>{};
     final context = PackageContext(
       sharedContext: sharedContext,
@@ -202,7 +207,9 @@ class PackageAnalyzer {
         final resourcesOutputDir = context.options.resourcesOutputDir;
         if (resourcesOutputDir != null) {
           Future<void> storeResource(
-              String resourcePath, Uint8List bytes) async {
+            String resourcePath,
+            Uint8List bytes,
+          ) async {
             final f = File(path.join(resourcesOutputDir, resourcePath));
             await f.parent.create(recursive: true);
             await f.writeAsBytes(bytes);
@@ -210,13 +217,21 @@ class PackageAnalyzer {
 
           await storeResource(processedScreenshot.webpImage, r.webpImageBytes!);
           await storeResource(
-              processedScreenshot.webp100Thumbnail, r.webp100ThumbnailBytes!);
+            processedScreenshot.webp100Thumbnail,
+            r.webp100ThumbnailBytes!,
+          );
           await storeResource(
-              processedScreenshot.png100Thumbnail, r.png100ThumbnailBytes!);
+            processedScreenshot.png100Thumbnail,
+            r.png100ThumbnailBytes!,
+          );
           await storeResource(
-              processedScreenshot.webp190Thumbnail, r.webp190ThumbnailBytes!);
+            processedScreenshot.webp190Thumbnail,
+            r.webp190ThumbnailBytes!,
+          );
           await storeResource(
-              processedScreenshot.png190Thumbnail, r.png190ThumbnailBytes!);
+            processedScreenshot.png190Thumbnail,
+            r.png190ThumbnailBytes!,
+          );
         }
       }
     }
@@ -281,7 +296,9 @@ Future<String?> _detectGitRoot(String packageDir) async {
 }
 
 Future<AnalysisResult> _createAnalysisResult(
-    PackageContext context, Report report) async {
+  PackageContext context,
+  Report report,
+) async {
   final pubspecUrls = await context.pubspecUrlsWithIssues;
   final repoVerification = await context.repository;
   final repository = repoVerification?.repository;

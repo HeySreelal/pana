@@ -46,11 +46,18 @@ class UrlWithIssue {
 /// Verifies the URLs in pubspec and builds the [PubspecUrlsWithIssues] object.
 Future<PubspecUrlsWithIssues> checkPubspecUrls(PackageContext context) async {
   final pubspec = context.pubspec;
-  var homepage = await _checkUrlInPubspec(context, 'homepage', 'Homepage URL',
-      isRequired: pubspec.repository == null);
+  var homepage = await _checkUrlInPubspec(
+    context,
+    'homepage',
+    'Homepage URL',
+    isRequired: pubspec.repository == null,
+  );
   var repository = await _checkUrlInPubspec(
-      context, 'repository', 'Repository URL',
-      isRequired: pubspec.homepage == null);
+    context,
+    'repository',
+    'Repository URL',
+    isRequired: pubspec.homepage == null,
+  );
   var issueTracker =
       await _checkUrlInPubspec(context, 'issue_tracker', 'Issue tracker URL');
 
@@ -79,7 +86,11 @@ Future<PubspecUrlsWithIssues> checkPubspecUrls(PackageContext context) async {
         path: p.join(repoSegments, 'issues'),
       ).toString();
       final inferredResult = await _checkUrl(
-          context, 'issue_tracker', 'Issue tracker URL', inferredUrl);
+        context,
+        'issue_tracker',
+        'Issue tracker URL',
+        inferredUrl,
+      );
       if (inferredResult.isOK) {
         issueTracker = inferredResult;
       }
@@ -88,7 +99,8 @@ Future<PubspecUrlsWithIssues> checkPubspecUrls(PackageContext context) async {
   final funding = <UrlWithIssue>[];
   for (final url in pubspec.funding) {
     funding.add(
-        await _checkUrl(context, 'funding', 'Funding URL', url.toString()));
+      await _checkUrl(context, 'funding', 'Funding URL', url.toString()),
+    );
   }
 
   return PubspecUrlsWithIssues(
@@ -112,8 +124,10 @@ Future<UrlWithIssue> _checkUrlInPubspec(
   if (content != null && content is! String) {
     return UrlWithIssue(
       null,
-      Issue('The `$key` entry, if present, should be a string containing a url',
-          span: tryGetSpanFromYamlMap(pubspec.originalYaml, key)),
+      Issue(
+        'The `$key` entry, if present, should be a string containing a url',
+        span: tryGetSpanFromYamlMap(pubspec.originalYaml, key),
+      ),
     );
   }
   final url = content as String?;
@@ -121,7 +135,9 @@ Future<UrlWithIssue> _checkUrlInPubspec(
   if (url == null || url.isEmpty) {
     if (isRequired) {
       return UrlWithIssue(
-          null, Issue("`pubspec.yaml` doesn't have a `$key` entry."));
+        null,
+        Issue("`pubspec.yaml` doesn't have a `$key` entry."),
+      );
     }
     return UrlWithIssue(null, null);
   }

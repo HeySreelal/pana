@@ -18,7 +18,7 @@ void testDiffRange() {
     diffs = [
       Diff(Operation.delete, 'previous deleted text '),
       Diff(Operation.equal, 'equal part of text'),
-      Diff(Operation.insert, 'extra text not belonging to known text')
+      Diff(Operation.insert, 'extra text not belonging to known text'),
     ];
     expected = Range(1, 2);
 
@@ -28,7 +28,7 @@ void testDiffRange() {
     diffs = [
       Diff(Operation.insert, 'insert this text '),
       Diff(Operation.equal, 'equal part of text'),
-      Diff(Operation.delete, ' this part was deleted')
+      Diff(Operation.delete, ' this part was deleted'),
     ];
     expected = Range(0, 3);
 
@@ -89,7 +89,7 @@ void testVerifyNoVersionChange() {
       expectException: false,
       diffs: [
         Diff(Operation.equal, 'the standard version'),
-        Diff(Operation.insert, '1.2')
+        Diff(Operation.insert, '1.2'),
       ],
     );
 
@@ -98,20 +98,23 @@ void testVerifyNoVersionChange() {
       expectException: false,
       diffs: [
         Diff(Operation.equal, 'version'),
-        Diff(Operation.insert, '1.0-2')
+        Diff(Operation.insert, '1.0-2'),
       ],
     );
   });
 }
 
-void _testVerifyNoVersionChange(
-    {required String name,
-    required Iterable<Diff> diffs,
-    bool expectException = true}) {
+void _testVerifyNoVersionChange({
+  required String name,
+  required Iterable<Diff> diffs,
+  bool expectException = true,
+}) {
   test(name, () {
     if (expectException) {
-      expect(() => verifyNoVersionChange(diffs, ''),
-          throwsA(isA<LicenseMismatchException>()));
+      expect(
+        () => verifyNoVersionChange(diffs, ''),
+        throwsA(isA<LicenseMismatchException>()),
+      );
     } else {
       expect(() => verifyNoVersionChange(diffs, ''), returnsNormally);
     }
@@ -130,21 +133,24 @@ void testVerifyNoGplChange() {
       diffs: [
         Diff(Operation.delete, 'library'),
         Diff(Operation.insert, 'lesser'),
-        Diff(Operation.equal, 'gnu')
+        Diff(Operation.equal, 'gnu'),
       ],
       expectException: false,
     );
   });
 }
 
-void _testVerifyNoGplChange(
-    {required String name,
-    required Iterable<Diff> diffs,
-    bool expectException = true}) {
+void _testVerifyNoGplChange({
+  required String name,
+  required Iterable<Diff> diffs,
+  bool expectException = true,
+}) {
   test(name, () {
     if (expectException) {
-      expect(() => verifyNoGplChange(diffs, ''),
-          throwsA(isA<LicenseMismatchException>()));
+      expect(
+        () => verifyNoGplChange(diffs, ''),
+        throwsA(isA<LicenseMismatchException>()),
+      );
     } else {
       expect(() => verifyNoGplChange(diffs, ''), returnsNormally);
     }
@@ -155,20 +161,22 @@ void testInducedPhraseChange() {
   group('Induced phrase change:', () {
     test('Throws exception', () {
       expect(
-          () => verifyInducedPhraseChange('Apache', [
-                Diff(Operation.equal, 'some equal text'),
-                Diff(Operation.insert, 'apache')
-              ]),
-          throwsA(isA<LicenseMismatchException>()));
+        () => verifyInducedPhraseChange('Apache', [
+          Diff(Operation.equal, 'some equal text'),
+          Diff(Operation.insert, 'apache'),
+        ]),
+        throwsA(isA<LicenseMismatchException>()),
+      );
     });
 
     test('Returns normally', () {
       expect(
-          () => verifyInducedPhraseChange('Apache', [
-                Diff(Operation.equal, 'some equal text'),
-                Diff(Operation.insert, 'some inserted text')
-              ]),
-          returnsNormally);
+        () => verifyInducedPhraseChange('Apache', [
+          Diff(Operation.equal, 'some equal text'),
+          Diff(Operation.insert, 'some inserted text'),
+        ]),
+        returnsNormally,
+      );
     });
   });
 }

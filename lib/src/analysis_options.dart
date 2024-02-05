@@ -36,8 +36,15 @@ Future<String> _getFlutterAnalysisOptions(String? flutterSdkDir) async {
   if (flutterSdkDir != null &&
       flutterSdkDir.isNotEmpty &&
       await Directory(flutterSdkDir).exists()) {
-    final file = File(p.join(flutterSdkDir, 'packages', 'flutter', 'lib',
-        'analysis_options_user.yaml'));
+    final file = File(
+      p.join(
+        flutterSdkDir,
+        'packages',
+        'flutter',
+        'lib',
+        'analysis_options_user.yaml',
+      ),
+    );
     if (await file.exists()) {
       return await file.readAsString();
     }
@@ -48,8 +55,11 @@ Future<String> _getFlutterAnalysisOptions(String? flutterSdkDir) async {
     return _cachedFlutterOptionsOnGithub!;
   }
   try {
-    final rs = await _httpGetWithRetry(Uri.parse(
-        'https://raw.githubusercontent.com/flutter/flutter/master/packages/flutter/lib/analysis_options_user.yaml'));
+    final rs = await _httpGetWithRetry(
+      Uri.parse(
+        'https://raw.githubusercontent.com/flutter/flutter/master/packages/flutter/lib/analysis_options_user.yaml',
+      ),
+    );
     if (rs.statusCode == 200) {
       _cachedFlutterOptionsOnGithub = rs.body;
       return _cachedFlutterOptionsOnGithub!;
@@ -83,8 +93,11 @@ Future<String> _getLintsCoreAnalysisOptions() async {
     return _cachedLintsCoreOptionsOnGithub!;
   }
   try {
-    final rs = await _httpGetWithRetry(Uri.parse(
-        'https://raw.githubusercontent.com/dart-lang/lints/main/lib/core.yaml'));
+    final rs = await _httpGetWithRetry(
+      Uri.parse(
+        'https://raw.githubusercontent.com/dart-lang/lints/main/lib/core.yaml',
+      ),
+    );
     if (rs.statusCode == 200 && rs.body.contains('rules:')) {
       _cachedLintsCoreOptionsOnGithub = rs.body;
       return _cachedLintsCoreOptionsOnGithub!;
@@ -104,7 +117,8 @@ Future<http.Response> _httpGetWithRetry(Uri uri) async {
       final rs = await http.get(uri);
       if (rs.statusCode >= 500 && rs.statusCode < 600) {
         throw http.ClientException(
-            'Server returned status code: ${rs.statusCode}');
+          'Server returned status code: ${rs.statusCode}',
+        );
       }
       return rs;
     },

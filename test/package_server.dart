@@ -65,7 +65,8 @@ class PackageServer {
   /// This server exists only for the duration of the pub run. Subsequent calls
   /// to [serve()] replace the previous server.
   static Future<PackageServer> start(
-      void Function(PackageServerBuilder?) callback) async {
+    void Function(PackageServerBuilder?) callback,
+  ) async {
     final result =
         PackageServer._(await shelf_io.IOServer.bind('localhost', 0));
     result.add(callback);
@@ -141,25 +142,33 @@ class PackageServer {
     _builder!._packages.forEach((name, package) {
       _servedApiPackageDir.contents.addAll([
         d.file(
-            name,
-            jsonEncode({
-              'name': name,
-              'uploaders': ['example@google.com'],
-              'versions': package.versions
-                  .map((version) => _packageVersionApiMap(url, version))
-                  .toList(),
-              if (package.isDiscontinued) 'isDiscontinued': true,
-              if (package.discontinuedReplacementText != null)
-                'replacedBy': package.discontinuedReplacementText,
-            })),
+          name,
+          jsonEncode({
+            'name': name,
+            'uploaders': ['example@google.com'],
+            'versions': package.versions
+                .map((version) => _packageVersionApiMap(url, version))
+                .toList(),
+            if (package.isDiscontinued) 'isDiscontinued': true,
+            if (package.discontinuedReplacementText != null)
+              'replacedBy': package.discontinuedReplacementText,
+          }),
+        ),
       ]);
 
-      _servedPackageDir.contents.add(d.dir(name, [
-        d.dir(
+      _servedPackageDir.contents.add(
+        d.dir(name, [
+          d.dir(
             'versions',
-            package.versions.map((version) => TarFileDescriptor(
-                '${version.version}.tar.gz', version.contents)))
-      ]));
+            package.versions.map(
+              (version) => TarFileDescriptor(
+                '${version.version}.tar.gz',
+                version.contents,
+              ),
+            ),
+          ),
+        ]),
+      );
     });
   }
 }
@@ -200,16 +209,19 @@ class PackageServerBuilder {
   ///
   /// If [contents] is passed, it's used as the contents of the package. By
   /// default, a package just contains a dummy lib directory.
-  void serve(String name, String version,
-      {Map<String, dynamic>? deps,
-      Map<String, dynamic>? pubspec,
-      Map<String, String>? versionData,
-      Iterable<d.Descriptor>? contents,
-      DateTime? published}) {
+  void serve(
+    String name,
+    String version, {
+    Map<String, dynamic>? deps,
+    Map<String, dynamic>? pubspec,
+    Map<String, String>? versionData,
+    Iterable<d.Descriptor>? contents,
+    DateTime? published,
+  }) {
     var pubspecFields = <String, dynamic>{
       'name': name,
       'version': version,
-      'environment': {'sdk': '>=2.12.0 <4.0.0'}
+      'environment': {'sdk': '>=2.12.0 <4.0.0'},
     };
     if (pubspec != null) pubspecFields.addAll(pubspec);
     if (deps != null) pubspecFields['dependencies'] = deps;
@@ -225,7 +237,7 @@ class PackageServerBuilder {
             'pubspec.yaml',
             const JsonEncoder.withIndent('  ').convert(pubspecFields),
           ),
-          ...contents
+          ...contents,
         ],
         published: published,
       ),
@@ -266,8 +278,10 @@ class TarFileDescriptor extends d.FileDescriptor {
       : contents = contents.toList(),
         super.protected();
 
-  Future<Iterable<TarEntry>> allFiles(d.Descriptor descriptor,
-      [String path = '.']) async {
+  Future<Iterable<TarEntry>> allFiles(
+    d.Descriptor descriptor, [
+    String path = '.',
+  ]) async {
     if (descriptor is d.FileDescriptor) {
       final size =
           await descriptor.readAsBytes().fold<int>(0, (i, l) => i + l.length);
@@ -282,13 +296,13 @@ class TarFileDescriptor extends d.FileDescriptor {
             groupName: 'pub',
           ),
           descriptor.readAsBytes(),
-        )
+        ),
       ];
     }
 
     final dir = descriptor as d.DirectoryDescriptor;
     return [
-      for (final c in dir.contents) ...await allFiles(c, '$path/${dir.name}')
+      for (final c in dir.contents) ...await allFiles(c, '$path/${dir.name}'),
     ];
   }
 

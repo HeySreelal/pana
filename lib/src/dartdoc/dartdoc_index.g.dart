@@ -21,7 +21,8 @@ DartdocIndexEntry _$DartdocIndexEntryFromJson(Map<String, dynamic> json) =>
       enclosedBy: json['enclosedBy'] == null
           ? null
           : DartdocIndexEntryEnclosedBy.fromJson(
-              json['enclosedBy'] as Map<String, dynamic>),
+              json['enclosedBy'] as Map<String, dynamic>,
+            ),
     );
 
 Map<String, dynamic> _$DartdocIndexEntryToJson(DartdocIndexEntry instance) {
@@ -46,7 +47,8 @@ Map<String, dynamic> _$DartdocIndexEntryToJson(DartdocIndexEntry instance) {
 }
 
 DartdocIndexEntryEnclosedBy _$DartdocIndexEntryEnclosedByFromJson(
-        Map<String, dynamic> json) =>
+  Map<String, dynamic> json,
+) =>
     DartdocIndexEntryEnclosedBy(
       name: json['name'] as String?,
       kind: json['kind'] as int?,
@@ -54,7 +56,8 @@ DartdocIndexEntryEnclosedBy _$DartdocIndexEntryEnclosedByFromJson(
     );
 
 Map<String, dynamic> _$DartdocIndexEntryEnclosedByToJson(
-    DartdocIndexEntryEnclosedBy instance) {
+  DartdocIndexEntryEnclosedBy instance,
+) {
   final val = <String, dynamic>{};
 
   void writeNotNull(String key, dynamic value) {

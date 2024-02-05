@@ -64,8 +64,12 @@ Future<PanaProcessResult> _runConstrained(
   maxOutputBytes ??= _maxOutputBytes;
 
   log.info('Running `${[...arguments].join(' ')}`...');
-  var process = await Process.start(arguments.first, arguments.skip(1).toList(),
-      workingDirectory: workingDirectory, environment: environment);
+  var process = await Process.start(
+    arguments.first,
+    arguments.skip(1).toList(),
+    workingDirectory: workingDirectory,
+    environment: environment,
+  );
 
   var stdoutLines = <List<int>>[];
   var stderrLines = <List<int>>[];
@@ -107,7 +111,7 @@ Future<PanaProcessResult> _runConstrained(
         wasOutputExceeded = true;
         killProc('Output exceeded $maxOutputBytes bytes.');
       }
-    })
+    }),
   ]);
 
   timer.cancel();
@@ -259,7 +263,8 @@ class PanaProcessResult {
       return json.decode(value) as Map<String, dynamic>;
     } on FormatException catch (_) {
       throw ToolException(
-          'Unable to parse output as JSON:\n\n```\n$asTrimmedOutput\n```\n');
+        'Unable to parse output as JSON:\n\n```\n$asTrimmedOutput\n```\n',
+      );
     }
   }
 }

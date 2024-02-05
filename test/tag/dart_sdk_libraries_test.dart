@@ -12,8 +12,11 @@ import 'package:test/test.dart';
 /// all of them are mentioned in `lib/src/tag/_specs.dart`.
 void main() {
   test('Dart SDK libraries exist in _specs.dart', () async {
-    final rs = await get(Uri.parse(
-        'https://raw.githubusercontent.com/dart-lang/sdk/main/sdk/lib/libraries.json'));
+    final rs = await get(
+      Uri.parse(
+        'https://raw.githubusercontent.com/dart-lang/sdk/main/sdk/lib/libraries.json',
+      ),
+    );
     expect(rs.statusCode, 200);
     final parsed = json.decode(rs.body) as Map;
     final allLibraries = <String>{};

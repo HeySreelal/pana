@@ -29,7 +29,9 @@ Map<String, dynamic> _$PubDartdocDataToJson(PubDartdocData instance) {
 
   writeNotNull('coverage', instance.coverage?.toJson());
   writeNotNull(
-      'apiElements', instance.apiElements?.map((e) => e.toJson()).toList());
+    'apiElements',
+    instance.apiElements?.map((e) => e.toJson()).toList(),
+  );
   return val;
 }
 
@@ -81,6 +83,8 @@ Map<String, dynamic> _$CoverageToJson(Coverage instance) {
   }
 
   writeNotNull(
-      'symbolsMissingDocumentation', instance.symbolsMissingDocumentation);
+    'symbolsMissingDocumentation',
+    instance.symbolsMissingDocumentation,
+  );
   return val;
 }

@@ -237,7 +237,9 @@ class PackageContext {
   late final pubspecUrlsWithIssues = checkPubspecUrls(this);
 
   late final repository = sharedContext.verifyRepository(
-      pubspec.name, pubspec.repositoryOrHomepage);
+    pubspec.name,
+    pubspec.repositoryOrHomepage,
+  );
 
   late final licenses = detectLicenseInDir(packageDir);
   late final licenceTags = () async {
@@ -265,7 +267,8 @@ class PackageContext {
         );
         if (pr.wasTimeout) {
           return DartdocResult.error(
-              '`dartdoc` could not complete in $timeout.');
+            '`dartdoc` could not complete in $timeout.',
+          );
         }
         if (pr.wasError) {
           return DartdocResult.error(pr.asTrimmedOutput);
@@ -277,7 +280,8 @@ class PackageContext {
             await File(p.join(dartdocOutputDir, 'index.json')).exists();
         if (!hasIndexHtml || !hasIndexJson) {
           return DartdocResult.error(
-              '`dartdoc` did not create expected output files.');
+            '`dartdoc` did not create expected output files.',
+          );
         }
         return DartdocResult.success();
       } catch (e, st) {
@@ -286,7 +290,8 @@ class PackageContext {
       }
     } else {
       return DartdocResult.error(
-          'Dependency resultion failed, unable to run `dartdoc`.');
+        'Dependency resultion failed, unable to run `dartdoc`.',
+      );
     }
   }();
 

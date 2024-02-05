@@ -9,14 +9,15 @@ import 'package:path/path.dart' as p;
 import 'internal_model.dart';
 import 'tool/run_constrained.dart' show ToolException;
 
-// ignore: prefer_interpolation_to_compose_strings
-final _regexp = RegExp('^' + // beginning of line
-        '([\\w_\\.]+)\\|' * 3 + // first three error notes
-        '([^\\|]+)\\|' + // file path
-        '([\\w_\\.]+)\\|' * 3 + // line, column, length
-        '(.*?)' + // rest is the error message
-        '\$' // end of line
-    );
+final _regexp = RegExp(
+  // ignore: prefer_interpolation_to_compose_strings
+  '^' + // beginning of line
+      '([\\w_\\.]+)\\|' * 3 + // first three error notes
+      '([^\\|]+)\\|' + // file path
+      '([\\w_\\.]+)\\|' * 3 + // line, column, length
+      '(.*?)' + // rest is the error message
+      '\$', // end of line
+);
 
 CodeProblem? parseCodeProblem(String content, {String? projectDir}) {
   if (content.isEmpty) {
@@ -65,7 +66,9 @@ CodeProblem? parseCodeProblem(String content, {String? projectDir}) {
     }
 
     throw ToolException(
-        'Analysis failed with unexpected output.\n`$content`', null);
+      'Analysis failed with unexpected output.\n`$content`',
+      null,
+    );
   }
 
   var match = matches.single;

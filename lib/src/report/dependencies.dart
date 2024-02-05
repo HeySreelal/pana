@@ -75,28 +75,32 @@ Future<ReportSection> trustworthyDependency(PackageContext context) async {
 
         final depsTable = outdated.packages
             .where((p) => pubspec.dependencies.containsKey(p.package))
-            .map((p) => [
-                  linkToPackage(p.package),
-                  constraint(pubspec.dependencies[p.package]!),
-                  p.upgradable?.version ?? '-',
-                  if (outdatedVersions.containsKey(p.package) &&
-                      outdatedVersions[p.package]!.isNotEmpty)
-                    '**${p.latest?.version ?? '-'}**'
-                  else
-                    p.latest?.version ?? '-',
-                ])
+            .map(
+              (p) => [
+                linkToPackage(p.package),
+                constraint(pubspec.dependencies[p.package]!),
+                p.upgradable?.version ?? '-',
+                if (outdatedVersions.containsKey(p.package) &&
+                    outdatedVersions[p.package]!.isNotEmpty)
+                  '**${p.latest?.version ?? '-'}**'
+                else
+                  p.latest?.version ?? '-',
+              ],
+            )
             .toList();
 
         final transitiveTable = outdated.packages
             .where((p) => !pubspec.dependencies.containsKey(p.package))
             // See: https://github.com/dart-lang/pub/issues/2552
             .where((p) => p.upgradable != null)
-            .map((p) => [
-                  linkToPackage(p.package),
-                  '-',
-                  p.upgradable?.version ?? '-',
-                  p.latest?.version ?? '-',
-                ])
+            .map(
+              (p) => [
+                linkToPackage(p.package),
+                '-',
+                p.upgradable?.version ?? '-',
+                p.latest?.version ?? '-',
+              ],
+            )
             .toList();
 
         bodyPrefix = [
@@ -126,7 +130,9 @@ Future<ReportSection> trustworthyDependency(PackageContext context) async {
         for (final l in outdatedVersions.values) {
           if (l.isNotEmpty) {
             final worst = maxBy<OutdatedVersionDescription>(
-                l, (a, b) => a.status.index - b.status.index);
+              l,
+              (a, b) => a.status.index - b.status.index,
+            );
             issues.add(worst.issue);
             if (worst.status == OutdatedStatus.outdated) {
               points = 0;
@@ -140,14 +146,21 @@ Future<ReportSection> trustworthyDependency(PackageContext context) async {
           }
         }
       } on ToolException catch (e) {
-        issues.add(Issue(
-            'Could not run `${context.usesFlutter ? 'flutter' : 'dart'} pub outdated`: ${e.message}'));
+        issues.add(
+          Issue(
+            'Could not run `${context.usesFlutter ? 'flutter' : 'dart'} pub outdated`: ${e.message}',
+          ),
+        );
         points = 0;
         status = ReportStatus.failed;
       }
     } else {
-      issues.add(_unsupportedDartSdk(context,
-          command: '${context.usesFlutter ? 'flutter' : 'dart'} pub outdated'));
+      issues.add(
+        _unsupportedDartSdk(
+          context,
+          command: '${context.usesFlutter ? 'flutter' : 'dart'} pub outdated',
+        ),
+      );
       points = 0;
       status = ReportStatus.failed;
     }
@@ -166,11 +179,19 @@ Future<ReportSection> trustworthyDependency(PackageContext context) async {
     final issues = <Issue>[];
     final sdkConstraint = pubspec.dartSdkConstraint;
     if (sdkConstraint == null) {
-      issues.add(Issue('Pubspec.yaml does not have an sdk version constraint.',
-          suggestion: 'Try adding an sdk constraint to your `pubspec.yaml`'));
+      issues.add(
+        Issue(
+          'Pubspec.yaml does not have an sdk version constraint.',
+          suggestion: 'Try adding an sdk constraint to your `pubspec.yaml`',
+        ),
+      );
     } else if (!context.pubspecAllowsCurrentSdk) {
-      issues.add(_unsupportedDartSdk(context,
-          suggestion: 'Try widening the upper boundary of the constraint.'));
+      issues.add(
+        _unsupportedDartSdk(
+          context,
+          suggestion: 'Try widening the upper boundary of the constraint.',
+        ),
+      );
     }
 
     final runtimeInfo = toolEnvironment.runtimeInfo;
@@ -178,8 +199,11 @@ Future<ReportSection> trustworthyDependency(PackageContext context) async {
 
     if (usesFlutter) {
       if (!runtimeInfo.hasFlutter) {
-        issues.add(Issue(
-            'Found no Flutter in your PATH. Could not determine the current Flutter version.'));
+        issues.add(
+          Issue(
+            'Found no Flutter in your PATH. Could not determine the current Flutter version.',
+          ),
+        );
       } else {
         final flutterDartVersion =
             Version.parse(runtimeInfo.flutterInternalDartSdkVersion!);
@@ -236,10 +260,14 @@ Future<ReportSection> trustworthyDependency(PackageContext context) async {
   );
 }
 
-Issue _unsupportedDartSdk(PackageContext context,
-    {String? command, String? suggestion}) {
+Issue _unsupportedDartSdk(
+  PackageContext context, {
+  String? command,
+  String? suggestion,
+}) {
   final msg = StringBuffer(
-      "Sdk constraint doesn't support current Dart version ${context.currentSdkVersion}.");
+    "Sdk constraint doesn't support current Dart version ${context.currentSdkVersion}.",
+  );
   if (command != null) {
     msg.write(' Cannot run `$command`.');
   }
@@ -261,7 +289,9 @@ class OutdatedVersionDescription {
 /// Returns a list of stable unsupported versions newer than "upgradable", along
 /// with "how badly" it is outdated.
 Future<List<OutdatedVersionDescription>> computeOutdatedVersions(
-    PackageContext context, OutdatedPackage package) async {
+  PackageContext context,
+  OutdatedPackage package,
+) async {
   const acceptableUpdateDelay = Duration(days: 30);
   T? tryGetFromJson<T>(Map<String, dynamic> json, String key) {
     final element = json[key];
@@ -289,12 +319,18 @@ Future<List<OutdatedVersionDescription>> computeOutdatedVersions(
       (pubHostedUrlFromEnv != null && pubHostedUrlFromEnv.isNotEmpty)
           ? Uri.tryParse(pubHostedUrlFromEnv)
           : null;
-  final versionListing = jsonDecode(await getVersionListing(name,
-      pubHostedUrl: hostedDependency.hosted?.url ?? pubHostedUriFromEnv));
+  final versionListing = jsonDecode(
+    await getVersionListing(
+      name,
+      pubHostedUrl: hostedDependency.hosted?.url ?? pubHostedUriFromEnv,
+    ),
+  );
 
   try {
     final versions = tryGetFromJson<List>(
-        versionListing as Map<String, dynamic>, 'versions');
+      versionListing as Map<String, dynamic>,
+      'versions',
+    );
     if (versions == null) {
       // Bad response from pub host.
       return [];
@@ -319,14 +355,17 @@ Future<List<OutdatedVersionDescription>> computeOutdatedVersions(
         }
 
         final publishingDateString = tryGetFromJson<String>(
-                version, 'published') ??
+              version,
+              'published',
+            ) ??
             // If the pub host doesn't provide a `published` time, we pretend it
             // was published loong ago.
             DateTime.fromMillisecondsSinceEpoch(0).toIso8601String();
         final publishingDate = DateTime.parse(publishingDateString);
         final timeAgo = DateTime.now().difference(publishingDate);
         if (timeAgo < acceptableUpdateDelay) {
-          result.add(OutdatedVersionDescription(
+          result.add(
+            OutdatedVersionDescription(
               Issue(
                 'The constraint `${hostedDependency.version}` on $name does not support the stable version `$versionString`, '
                 'that was published ${timeAgo.inDays} days ago. '
@@ -334,34 +373,44 @@ Future<List<OutdatedVersionDescription>> computeOutdatedVersions(
                 suggestion:
                     'Try running `dart pub upgrade --major-versions $name` to update the constraint.',
               ),
-              OutdatedStatus.outdatedByRecent));
+              OutdatedStatus.outdatedByRecent,
+            ),
+          );
         } else {
           final pubspec = Pubspec.fromJson(
-              tryGetFromJson<Map<String, dynamic>>(version, 'pubspec')!);
+            tryGetFromJson<Map<String, dynamic>>(version, 'pubspec')!,
+          );
           if (pubspec.hasDartSdkConstraint &&
               !pubspec.dartSdkConstraint!.allows(context.currentSdkVersion)) {
-            result.add(OutdatedVersionDescription(
+            result.add(
+              OutdatedVersionDescription(
                 Issue(
                     'The constraint `${hostedDependency.version}` on $name does not support the stable version `$versionString`, '
                     'but that version doesn\'t support the current Dart SDK version ${context.currentSdkVersion}.'
                     '\n\nWhen a supporting stable sdk is pubslished, this package will no longer be awarded points in this category.'),
-                OutdatedStatus.outdatedByPreview));
+                OutdatedStatus.outdatedByPreview,
+              ),
+            );
           } else {
-            result.add(OutdatedVersionDescription(
+            result.add(
+              OutdatedVersionDescription(
                 Issue(
                   'The constraint `${hostedDependency.version}` on $name does not support '
                   'the stable version `$versionString`.',
                   suggestion:
                       'Try running `dart pub upgrade --major-versions $name` to update the constraint.',
                 ),
-                OutdatedStatus.outdated));
+                OutdatedStatus.outdated,
+              ),
+            );
           }
         }
       }
     }
   } on FormatException catch (e) {
     log.warning(
-        'Failure when trying to calculate outdated status of $name. $e');
+      'Failure when trying to calculate outdated status of $name. $e',
+    );
     // Just go with whatever we found at this point - pub servers are not all
     // expected to provide a well-formatted `published` entry.
     return result;

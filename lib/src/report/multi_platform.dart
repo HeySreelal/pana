@@ -36,7 +36,9 @@ Future<ReportSection> multiPlatform(String packageDir, Pubspec pubspec) async {
     }
 
     Subsection scorePlatforms(
-        List<String> tags, List<Explanation> explanations) {
+      List<String> tags,
+      List<Explanation> explanations,
+    ) {
       final tagNames = const {
         PanaTags.platformIos: 'iOS',
         PanaTags.platformAndroid: 'Android',
@@ -49,9 +51,11 @@ Future<ReportSection> multiPlatform(String packageDir, Pubspec pubspec) async {
           explanations.where((e) => e.tag != null && e.tag!.startsWith('sdk:'));
       final platformExplanations = explanations
           .where((e) => e.tag == null || !e.tag!.startsWith('sdk:'));
-      final officialExplanations = platformExplanations.where((e) =>
-          !tags.contains(e.tag) &&
-          (e.tag == null || tagNames.containsKey(e.tag)));
+      final officialExplanations = platformExplanations.where(
+        (e) =>
+            !tags.contains(e.tag) &&
+            (e.tag == null || tagNames.containsKey(e.tag)),
+      );
       final trustExplanations = explanations.where((e) => tags.contains(e.tag));
       final paragraphs = <Paragraph>[
         if (sdkExplanations.isNotEmpty) RawParagraph('SDK issues found:'),
@@ -66,7 +70,8 @@ Future<ReportSection> multiPlatform(String packageDir, Pubspec pubspec) async {
         ...officialExplanations.map(explanationToIssue),
         if (trustExplanations.isNotEmpty)
           RawParagraph(
-              '\nThese issues are present but do not affect the score, because they may not originate in your package:\n'),
+            '\nThese issues are present but do not affect the score, because they may not originate in your package:\n',
+          ),
         ...trustExplanations.map(explanationToIssue),
       ];
 
@@ -79,7 +84,7 @@ Future<ReportSection> multiPlatform(String packageDir, Pubspec pubspec) async {
       final score = {
         ReportStatus.failed: 0,
         ReportStatus.partial: 10,
-        ReportStatus.passed: 20
+        ReportStatus.passed: 20,
       }[status];
 
       final platforms = platformList(tags, tagNames);
@@ -109,7 +114,7 @@ Future<ReportSection> multiPlatform(String packageDir, Pubspec pubspec) async {
           'Could not determine supported platforms as package resolution failed.',
           suggestion:
               'Run `${flutterPackage ? 'flutter' : 'dart'} pub get` for more information.',
-        )
+        ),
       ],
       0,
       20,
@@ -118,10 +123,11 @@ Future<ReportSection> multiPlatform(String packageDir, Pubspec pubspec) async {
   }
 
   return makeSection(
-      id: ReportSectionId.platform,
-      title: 'Platform support',
-      maxPoints: 20,
-      basePath: packageDir,
-      subsections: [subsection],
-      maxIssues: 20);
+    id: ReportSectionId.platform,
+    title: 'Platform support',
+    maxPoints: 20,
+    basePath: packageDir,
+    subsections: [subsection],
+    maxIssues: 20,
+  );
 }

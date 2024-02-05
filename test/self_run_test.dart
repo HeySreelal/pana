@@ -7,22 +7,26 @@ import 'package:test/test.dart';
 
 void main() {
   final timeout = const Duration(minutes: 5);
-  test('running pana locally with relative path', () async {
-    final pr = await runConstrained(
-      ['dart', 'bin/pana.dart', '--no-warning', '.'],
-      timeout: timeout,
-    );
-    expect(pr.exitCode, 0, reason: pr.asJoinedOutput);
+  test(
+    'running pana locally with relative path',
+    () async {
+      final pr = await runConstrained(
+        ['dart', 'bin/pana.dart', '--no-warning', '.'],
+        timeout: timeout,
+      );
+      expect(pr.exitCode, 0, reason: pr.asJoinedOutput);
 
-    final output = pr.stdout.asString;
-    final snippets = [
-      '## ✓ Follow Dart file conventions (30 / 30)',
-      '## ✓ Platform support (20 / 20)\n',
-      '[*] 10/10 points: All of the package dependencies are supported in the latest version',
-      '### [*] 10/10 points: Package supports latest stable Dart and Flutter SDKs',
-    ];
-    for (final snippet in snippets) {
-      expect(output, contains(snippet));
-    }
-  }, timeout: Timeout(timeout));
+      final output = pr.stdout.asString;
+      final snippets = [
+        '## ✓ Follow Dart file conventions (30 / 30)',
+        '## ✓ Platform support (20 / 20)\n',
+        '[*] 10/10 points: All of the package dependencies are supported in the latest version',
+        '### [*] 10/10 points: Package supports latest stable Dart and Flutter SDKs',
+      ];
+      for (final snippet in snippets) {
+        expect(output, contains(snippet));
+      }
+    },
+    timeout: Timeout(timeout),
+  );
 }

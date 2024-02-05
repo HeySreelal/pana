@@ -85,13 +85,19 @@ class BatchQueryCommand extends Command {
   }
 
   Future<List<String>> _getPackages(
-      String? query, String sort, int page) async {
-    final rs = await _client
-        .get(Uri.parse('https://pub.dev/api/search').replace(queryParameters: {
-      if (query != null && query.isNotEmpty) 'q': query,
-      if (page > 1) 'page': page.toString(),
-      'sort': sort,
-    }));
+    String? query,
+    String sort,
+    int page,
+  ) async {
+    final rs = await _client.get(
+      Uri.parse('https://pub.dev/api/search').replace(
+        queryParameters: {
+          if (query != null && query.isNotEmpty) 'q': query,
+          if (page > 1) 'page': page.toString(),
+          'sort': sort,
+        },
+      ),
+    );
     if (rs.statusCode != 200) {
       throw AssertionError('Unexpected status code: ${rs.statusCode}');
     }

@@ -208,8 +208,10 @@ class GitLocalRepository {
     if (p.normalize(path) != path) {
       throw GitToolException.argument('Path "$path" is not normalized.');
     }
-    if (p.split(path).any((segment) =>
-        _acceptedPathSegmentsRegExp.matchAsPrefix(segment) == null)) {
+    if (p.split(path).any(
+          (segment) =>
+              _acceptedPathSegmentsRegExp.matchAsPrefix(segment) == null,
+        )) {
       throw GitToolException.argument('Path "$path" is not accepted.');
     }
   }

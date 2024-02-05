@@ -19,8 +19,9 @@ void main() {
   test('run with bad option shows help text. Help text is included in readme ',
       () async {
     var process = await TestProcess.start(
-        p.join(p.dirname(Platform.resolvedExecutable), 'dart'),
-        ['pub', 'run', 'pana', '--monkey']);
+      p.join(p.dirname(Platform.resolvedExecutable), 'dart'),
+      ['pub', 'run', 'pana', '--monkey'],
+    );
 
     var output = await process.stdoutStream().join('\n');
 
@@ -33,8 +34,10 @@ void main() {
 
     var readme = File('README.md');
     expect(
-        readme.readAsStringSync().replaceAll('\r\n', '\n'),
-        contains(
-            '```\n${File(helpGoldenPath).readAsStringSync().replaceAll('\r\n', '\n')}\n```'));
+      readme.readAsStringSync().replaceAll('\r\n', '\n'),
+      contains(
+        '```\n${File(helpGoldenPath).readAsStringSync().replaceAll('\r\n', '\n')}\n```',
+      ),
+    );
   });
 }

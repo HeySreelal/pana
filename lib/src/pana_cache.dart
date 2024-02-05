@@ -58,11 +58,13 @@ class PanaCache {
     String id,
     Map<String, dynamic> data,
   ) async {
-    final bytes = utf8.encode(json.encode({
-      'id': id,
-      'ts': DateTime.now().toUtc().toIso8601String(),
-      'data': data,
-    }));
+    final bytes = utf8.encode(
+      json.encode({
+        'id': id,
+        'ts': DateTime.now().toUtc().toIso8601String(),
+        'data': data,
+      }),
+    );
     await _storage.writeBytes(_filePath(type, id), bytes);
   }
 

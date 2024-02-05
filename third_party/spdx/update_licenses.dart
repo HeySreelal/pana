@@ -70,12 +70,14 @@ Future<void> removeUnnecessaryFiles() async {
     }
     final isOsiApproved = (jsonData['isOsiApproved'] as bool?) ?? false;
     final isFsfLibre = (jsonData['isFsfLibre'] as bool?) ?? false;
-    licenses.add(_LicenseData(
-      identifier,
-      text,
-      isFsfLibre: isFsfLibre,
-      isOsiApproved: isOsiApproved,
-    ));
+    licenses.add(
+      _LicenseData(
+        identifier,
+        text,
+        isFsfLibre: isFsfLibre,
+        isOsiApproved: isOsiApproved,
+      ),
+    );
   }
 
   _removeDuplicates(licenses);
@@ -99,22 +101,24 @@ Future<void> removeUnnecessaryFiles() async {
     }
   }
 
-  await File('$_spdxPath/licenses.dart').writeAsString([
-    '// Copyright (c) 2022, the Dart project authors.  Please see the AUTHORS file',
-    '// for details. All rights reserved. Use of this source code is governed by a',
-    '// BSD-style license that can be found in the LICENSE file.',
-    '',
-    '/// FSF Free/Libre',
-    'const fsfLibreLicenses = <String>{',
-    ...(fsfLibre.toList()..sort()).map((id) => '  \'$id\','),
-    '};',
-    '',
-    '/// OSI Approved',
-    'const osiApprovedLicenses = <String>{',
-    ...(osiApproved.toList()..sort()).map((id) => '  \'$id\','),
-    '};',
-    '',
-  ].join('\n'));
+  await File('$_spdxPath/licenses.dart').writeAsString(
+    [
+      '// Copyright (c) 2022, the Dart project authors.  Please see the AUTHORS file',
+      '// for details. All rights reserved. Use of this source code is governed by a',
+      '// BSD-style license that can be found in the LICENSE file.',
+      '',
+      '/// FSF Free/Libre',
+      'const fsfLibreLicenses = <String>{',
+      ...(fsfLibre.toList()..sort()).map((id) => '  \'$id\','),
+      '};',
+      '',
+      '/// OSI Approved',
+      'const osiApprovedLicenses = <String>{',
+      ...(osiApproved.toList()..sort()).map((id) => '  \'$id\','),
+      '};',
+      '',
+    ].join('\n'),
+  );
 }
 
 /// This routine tries to find licenses having same text and retains only file among the duplicates with normalized name.
@@ -145,8 +149,9 @@ void _removeDuplicates(List<_LicenseData> licenses) {
 }
 
 final _similarReg = RegExp(
-    r'(-only|-or-later|-rfn|-no-rfn|-no-invariants-only|-no-invariants-or-later|-no-copyleft-exception)',
-    caseSensitive: false);
+  r'(-only|-or-later|-rfn|-no-rfn|-no-invariants-only|-no-invariants-or-later|-no-copyleft-exception)',
+  caseSensitive: false,
+);
 
 class _LicenseData {
   String identifier;

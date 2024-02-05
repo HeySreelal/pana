@@ -266,9 +266,12 @@ void diffCleanupMerge(List<Diff> diffs) {
                     diffs[i].text + textInsert.substring(0, commonlength);
               } else {
                 diffs.insert(
-                    0,
-                    Diff(Operation.equal,
-                        textInsert.substring(0, commonlength)));
+                  0,
+                  Diff(
+                    Operation.equal,
+                    textInsert.substring(0, commonlength),
+                  ),
+                );
                 pointer++;
               }
               textInsert = textInsert.substring(commonlength);
@@ -673,7 +676,7 @@ List<String>? _diffHalfMatchI(String longtext, String shorttext, int i) {
       bestLongtextB,
       bestShortTextA,
       bestShortTextB,
-      bestCommon
+      bestCommon,
     ];
   } else {
     return null;

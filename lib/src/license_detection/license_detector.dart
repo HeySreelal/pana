@@ -26,8 +26,11 @@ const _defaultSpdxLicenseDir = 'lib/src/third_party/spdx/licenses';
 List<License>? _cachedLicenses;
 Future<List<License>> _getDefaultLicenses() async {
   if (_cachedLicenses == null) {
-    final uri = await Isolate.resolvePackageUri(Uri.parse(
-        _defaultSpdxLicenseDir.replaceFirst('lib/', 'package:pana/')));
+    final uri = await Isolate.resolvePackageUri(
+      Uri.parse(
+        _defaultSpdxLicenseDir.replaceFirst('lib/', 'package:pana/'),
+      ),
+    );
     _cachedLicenses =
         loadLicensesFromDirectories([Directory.fromUri(uri!).path]);
   }
@@ -47,8 +50,11 @@ class Result {
   /// text that was not a part of any detected license.
   final int longestUnclaimedTokenCount;
 
-  Result(this.matches, this.unclaimedTokenPercentage,
-      this.longestUnclaimedTokenCount);
+  Result(
+    this.matches,
+    this.unclaimedTokenPercentage,
+    this.longestUnclaimedTokenCount,
+  );
 }
 
 /// Returns an instance of [Result] for every license in the corpus detected
@@ -57,7 +63,9 @@ Future<Result> detectLicense(String text, double threshold) async {
   final granularity = computeGranularity(threshold);
 
   final unknownLicense = LicenseWithNGrams.parse(
-      License.parse(identifier: '', content: text), granularity);
+    License.parse(identifier: '', content: text),
+    granularity,
+  );
 
   final possibleLicenses =
       filter(unknownLicense.tokenFrequency, await _getDefaultLicenses())
@@ -88,8 +96,11 @@ Future<Result> detectLicense(String text, double threshold) async {
       claculateUnclaimedTokenPercentage(result, unknownLicense.tokens.length);
   final longestUnclaimedTokenCount =
       findLongestUnclaimedTokenRange(result, unknownLicense.tokens.length);
-  return Result(List.unmodifiable(result), unclaimedPercentage,
-      longestUnclaimedTokenCount);
+  return Result(
+    List.unmodifiable(result),
+    unclaimedPercentage,
+    longestUnclaimedTokenCount,
+  );
 }
 
 /// Returns the minimum number of token runs that must match according to
@@ -236,7 +247,9 @@ List<LicenseMatch> removeOverLappingMatches(List<LicenseMatch> matches) {
 /// same range and hence we have a possibilty of getting a score
 /// than 1.
 double claculateUnclaimedTokenPercentage(
-    List<LicenseMatch> matches, int unknownTokensCount) {
+  List<LicenseMatch> matches,
+  int unknownTokensCount,
+) {
   var claimedTokenCount = 0;
 
   for (var match in matches) {

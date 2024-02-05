@@ -41,8 +41,10 @@ void main() {
       expect(licenses[i].identifier, licenseNames[i]);
     }
 
-    expect(() => loadLicensesFromDirectories(['test/license_test_assets/']),
-        throwsFormatException);
+    expect(
+      () => loadLicensesFromDirectories(['test/license_test_assets/']),
+      throwsFormatException,
+    );
   });
 
   test('Test checksum generation', () {
@@ -74,7 +76,7 @@ void main() {
       3898316725: 1,
       3188174184: 1,
       1984569744: 1,
-      820879958: 1
+      820879958: 1,
     };
 
     final actual = generateChecksumMap(generateChecksums(tokenize(text), 3));

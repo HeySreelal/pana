@@ -153,7 +153,8 @@ class LibraryGraph implements DirectedGraph<Uri> {
     } catch (e) {
       log.info('Unable to parse "$uri".\n$e');
       throw TagException(
-          'Unable to parse uri: "$uri": `${e.toString().split('\n').first}`.');
+        'Unable to parse uri: "$uri": `${e.toString().split('\n').first}`.',
+      );
     }
   }
 
@@ -201,7 +202,7 @@ class PathFinder<T> {
   PathResult<T> findPath(T root) {
     final pathToCurrent = <T>[];
     final todo = <List<T>>[
-      [root]
+      [root],
     ];
     final visited = <T>{};
 

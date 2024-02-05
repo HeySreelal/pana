@@ -70,7 +70,8 @@ Future<VerifiedRepository?> checkRepository({
   late GitLocalRepository repo;
   try {
     repo = await GitLocalRepository.createLocalRepository(
-        parsedSourceUrl.cloneUrl);
+      parsedSourceUrl.cloneUrl,
+    );
     branch = await repo.detectDefaultBranch();
 
     // list all pubspec.yaml files
@@ -98,13 +99,17 @@ Future<VerifiedRepository?> checkRepository({
       } on GitToolException catch (e) {
         log.info('Unable to read "$path".', e);
         return _PubspecMatch(
-            path, hasMatchingName: false, 'Unable to read `$path`: $e.');
+          path,
+          hasMatchingName: false,
+          'Unable to read `$path`: $e.',
+        );
       }
       if (content.trim().isEmpty) {
         return _PubspecMatch(
-            path,
-            hasMatchingName: false,
-            '`$path` from the repository is empty.');
+          path,
+          hasMatchingName: false,
+          '`$path` from the repository is empty.',
+        );
       }
       // TODO: consider to allow the exceptions to pass here, to allow an
       //       unrelated, but badly formatted pubspec.yaml in the repository.
@@ -119,9 +124,10 @@ Future<VerifiedRepository?> checkRepository({
       }
       if (yamlDoc == null) {
         return _PubspecMatch(
-            path,
-            hasMatchingName: false,
-            '`$path` from the repository is not a valid YAML document.');
+          path,
+          hasMatchingName: false,
+          '`$path` from the repository is not a valid YAML document.',
+        );
       }
 
       late final Pubspec gitPubspec;
@@ -130,30 +136,34 @@ Future<VerifiedRepository?> checkRepository({
       } on FormatException catch (e, st) {
         log.info('Invalid pubspec content: $path', e, st);
         return _PubspecMatch(
-            path,
-            hasMatchingName: false,
-            '`$path` from the repository is not a valid pubspec.');
+          path,
+          hasMatchingName: false,
+          '`$path` from the repository is not a valid pubspec.',
+        );
       } on CheckedFromJsonException catch (e, st) {
         log.info('Invalid pubspec content: $path', e, st);
         return _PubspecMatch(
-            path,
-            hasMatchingName: false,
-            '`$path` from the repository is not a valid pubspec.');
+          path,
+          hasMatchingName: false,
+          '`$path` from the repository is not a valid pubspec.',
+        );
       }
 
       // verification steps
       if (gitPubspec.name != packageName) {
         return _PubspecMatch(
-            path,
-            hasMatchingName: false,
-            '`$path` from the repository name missmatch: expected `$packageName` but got `${gitPubspec.name}`.');
+          path,
+          hasMatchingName: false,
+          '`$path` from the repository name missmatch: expected `$packageName` but got `${gitPubspec.name}`.',
+        );
       }
       final gitRepoOrHomepage = gitPubspec.repositoryOrHomepage;
       if (gitRepoOrHomepage == null) {
         return _PubspecMatch(
-            path,
-            hasMatchingName: true,
-            '`$path` from the repository has no `repository` or `homepage` URL.');
+          path,
+          hasMatchingName: true,
+          '`$path` from the repository has no `repository` or `homepage` URL.',
+        );
       }
       late Repository gitRepoUrl;
       try {
@@ -167,21 +177,24 @@ Future<VerifiedRepository?> checkRepository({
       }
       if (gitRepoUrl.cloneUrl != parsedSourceUrl.cloneUrl) {
         return _PubspecMatch(
-            path,
-            hasMatchingName: true,
-            '`$path` from the repository URL mismatch: expected `${parsedSourceUrl.cloneUrl}` but got `${gitRepoUrl.cloneUrl}`.');
+          path,
+          hasMatchingName: true,
+          '`$path` from the repository URL mismatch: expected `${parsedSourceUrl.cloneUrl}` but got `${gitRepoUrl.cloneUrl}`.',
+        );
       }
       if (gitPubspec.version == null) {
         return _PubspecMatch(
-            path,
-            hasMatchingName: true,
-            '`$path` from the repository has no `version`.');
+          path,
+          hasMatchingName: true,
+          '`$path` from the repository has no `version`.',
+        );
       }
       if (gitPubspec.toJson().containsKey('publish_to')) {
         return _PubspecMatch(
-            path,
-            hasMatchingName: true,
-            '`$path` from the repository defines `publish_to`, thus, we are unable to verify the package is published from here.');
+          path,
+          hasMatchingName: true,
+          '`$path` from the repository defines `publish_to`, thus, we are unable to verify the package is published from here.',
+        );
       }
 
       // found no issue
@@ -196,10 +209,12 @@ Future<VerifiedRepository?> checkRepository({
     final nameMatches = results.where((e) => e.hasMatchingName).toList();
     if (nameMatches.isEmpty) {
       failVerification(
-          'Repository has no matching `pubspec.yaml` with `name: $packageName`.');
+        'Repository has no matching `pubspec.yaml` with `name: $packageName`.',
+      );
     } else if (nameMatches.length > 1) {
       failVerification(
-          'Repository has multiple matching `pubspec.yaml` with `name: $packageName`.');
+        'Repository has multiple matching `pubspec.yaml` with `name: $packageName`.',
+      );
     } else {
       // confirmed name match, storing path
       localPath = p.dirname(nameMatches.single.path);
@@ -233,10 +248,16 @@ Future<VerifiedRepository?> checkRepository({
     }
   } on FormatException catch (e, st) {
     failVerification(
-        'Unable to parse `pubspec.yaml` from git repository. $e', e, st);
+      'Unable to parse `pubspec.yaml` from git repository. $e',
+      e,
+      st,
+    );
   } on ArgumentError catch (e, st) {
     failVerification(
-        'Unable to parse `pubspec.yaml` from git repository. $e', e, st);
+      'Unable to parse `pubspec.yaml` from git repository. $e',
+      e,
+      st,
+    );
   } on GitToolException catch (e, st) {
     failVerification('Unable to access git repository: ${e.message}', e, st);
   } finally {

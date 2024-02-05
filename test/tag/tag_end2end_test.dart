@@ -11,8 +11,11 @@ import 'package:test_descriptor/test_descriptor.dart' as d;
 
 import '../package_descriptor.dart';
 
-void _expectTagging(void Function(List<String>, List<Explanation>) f,
-    {dynamic tags = anything, dynamic explanations = anything}) {
+void _expectTagging(
+  void Function(List<String>, List<Explanation>) f, {
+  dynamic tags = anything,
+  dynamic explanations = anything,
+}) {
   final actualTags = <String>[];
   final actualExplanations = <Explanation>[];
   f(actualTags, actualExplanations);
@@ -26,67 +29,88 @@ void main() {
   group('end2end tests', () {
     test('minimal', () async {
       final descriptor = d.dir('cache', [
-        packageWithPathDeps('my_package',
-            lib: [d.file('my_package.dart', 'int fourtyTwo() => 42;')])
+        packageWithPathDeps(
+          'my_package',
+          lib: [d.file('my_package.dart', 'int fourtyTwo() => 42;')],
+        ),
       ]);
       await descriptor.create();
       final tagger = Tagger(p.join(descriptor.io.path, 'my_package'));
-      _expectTagging(tagger.sdkTags,
-          tags: {'sdk:dart', 'sdk:flutter'}, explanations: isEmpty);
-      _expectTagging(tagger.platformTags,
-          tags: {
-            'platform:ios',
-            'platform:android',
-            'platform:web',
-            'platform:linux',
-            'platform:windows',
-            'platform:macos'
-          },
-          explanations: isEmpty);
-      _expectTagging(tagger.runtimeTags,
-          tags: {
-            'runtime:native-jit',
-            'runtime:native-aot',
-            'runtime:web',
-          },
-          explanations: isEmpty);
+      _expectTagging(
+        tagger.sdkTags,
+        tags: {'sdk:dart', 'sdk:flutter'},
+        explanations: isEmpty,
+      );
+      _expectTagging(
+        tagger.platformTags,
+        tags: {
+          'platform:ios',
+          'platform:android',
+          'platform:web',
+          'platform:linux',
+          'platform:windows',
+          'platform:macos',
+        },
+        explanations: isEmpty,
+      );
+      _expectTagging(
+        tagger.runtimeTags,
+        tags: {
+          'runtime:native-jit',
+          'runtime:native-aot',
+          'runtime:web',
+        },
+        explanations: isEmpty,
+      );
       _expectTagging(tagger.flutterPluginTags, tags: isEmpty);
     });
     test('analyzes the primary libray', () async {
       final descriptor = d.dir('cache', [
-        packageWithPathDeps('my_package', lib: [
-          d.file('a.dart', '''
+        packageWithPathDeps(
+          'my_package',
+          lib: [
+            d.file('a.dart', '''
 import 'dart:io';
 int fourtyTwo() => 42;
 '''),
-          d.file('my_package.dart', '''
+            d.file('my_package.dart', '''
 import 'dart:html';
 int fourtyThree() => 43;
 '''),
-          d.file('z.dart', '''
+            d.file('z.dart', '''
 import 'dart:io';
 int fourtyTwo() => 42;
 '''),
-        ]),
+          ],
+        ),
       ]);
       await descriptor.create();
       final tagger = Tagger(p.join(descriptor.io.path, 'my_package'));
       _expectTagging(tagger.sdkTags, tags: {'sdk:dart', 'sdk:flutter'});
-      _expectTagging(tagger.platformTags, tags: {
-        'platform:web',
-      });
-      _expectTagging(tagger.runtimeTags, tags: {
-        'runtime:web',
-      });
+      _expectTagging(
+        tagger.platformTags,
+        tags: {
+          'platform:web',
+        },
+      );
+      _expectTagging(
+        tagger.runtimeTags,
+        tags: {
+          'runtime:web',
+        },
+      );
     });
     test('no library named after package', () async {
       final descriptor = d.dir('cache', [
-        packageWithPathDeps('my_package', lib: [
-          d.file('other.dart', '''
+        packageWithPathDeps(
+          'my_package',
+          lib: [
+            d.file('other.dart', '''
 import 'dart:mirrors';
 int fourtyTwo() => 42;
 '''),
-        ])
+          ],
+        ),
       ]);
       await descriptor.create();
       final tagger = Tagger(p.join(descriptor.io.path, 'my_package'));
@@ -101,65 +125,80 @@ int fourtyTwo() => 42;
 
     test('flutter old style plugins', () async {
       final descriptor = d.dir('cache', [
-        packageWithPathDeps('my_package', lib: [
-          d.file('a.dart', '''
+        packageWithPathDeps(
+          'my_package',
+          lib: [
+            d.file('a.dart', '''
 import 'dart:io';
 int fourtyTwo() => 42;
 '''),
-        ], pubspecExtras: {
-          'environment': {'flutter': '>=1.2.0<=2.0.0'},
-          'flutter': {
-            'plugin': {
-              'iosPrefix': 'my_package',
-              'androidPackage': 'my,.android.package',
-            }
-          }
-        }),
+          ],
+          pubspecExtras: {
+            'environment': {'flutter': '>=1.2.0<=2.0.0'},
+            'flutter': {
+              'plugin': {
+                'iosPrefix': 'my_package',
+                'androidPackage': 'my,.android.package',
+              },
+            },
+          },
+        ),
       ]);
 
       await descriptor.create();
       final tagger = Tagger(p.join(descriptor.io.path, 'my_package'));
       _expectTagging(tagger.sdkTags, tags: {'sdk:flutter'});
-      _expectTagging(tagger.platformTags,
-          tags: {'platform:ios', 'platform:android'});
+      _expectTagging(
+        tagger.platformTags,
+        tags: {'platform:ios', 'platform:android'},
+      );
       _expectTagging(tagger.runtimeTags, tags: isEmpty);
       _expectTagging(tagger.flutterPluginTags, tags: {'is:plugin'});
     });
 
     test('flutter old style plugins2', () async {
       final descriptor = d.dir('cache', [
-        packageWithPathDeps('my_package', lib: [
-          d.file('my_package.dart', '''
+        packageWithPathDeps(
+          'my_package',
+          lib: [
+            d.file('my_package.dart', '''
 import 'dart:io';
 int fourtyTwo() => 42;
 '''),
-        ], pubspecExtras: {
-          'environment': {'flutter': '>=1.2.0<=2.0.0'},
-          'flutter': {
-            'plugin': {
-              'iosPrefix': 'my_package',
-            }
-          }
-        })
+          ],
+          pubspecExtras: {
+            'environment': {'flutter': '>=1.2.0<=2.0.0'},
+            'flutter': {
+              'plugin': {
+                'iosPrefix': 'my_package',
+              },
+            },
+          },
+        ),
       ]);
 
       await descriptor.create();
       final tagger = Tagger(p.join(descriptor.io.path, 'my_package'));
       _expectTagging(tagger.sdkTags, tags: {'sdk:flutter'});
-      _expectTagging(tagger.platformTags,
-          tags: {'platform:ios', 'platform:android'});
+      _expectTagging(
+        tagger.platformTags,
+        tags: {'platform:ios', 'platform:android'},
+      );
       _expectTagging(tagger.runtimeTags, tags: isEmpty);
       _expectTagging(tagger.flutterPluginTags, tags: {'is:plugin'});
     });
 
     test('using dart:mirrors disqualifies Flutter and aot', () async {
       final descriptor = d.dir('cache', [
-        packageWithPathDeps('my_package', lib: [
-          d.file('my_package.dart', '''
+        packageWithPathDeps(
+          'my_package',
+          lib: [
+            d.file('my_package.dart', '''
 import 'dart:mirrors';
 int fourtyTwo() => 42;
 '''),
-        ])
+          ],
+        ),
       ]);
       await descriptor.create();
       final tagger = Tagger(p.join(descriptor.io.path, 'my_package'));
@@ -168,32 +207,43 @@ int fourtyTwo() => 42;
         tagger.platformTags,
         tags: {'platform:linux', 'platform:macos', 'platform:windows'},
       );
-      _expectTagging(tagger.runtimeTags, tags: {
-        'runtime:native-jit',
-      });
+      _expectTagging(
+        tagger.runtimeTags,
+        tags: {
+          'runtime:native-jit',
+        },
+      );
       _expectTagging(tagger.flutterPluginTags, tags: isEmpty);
     });
     test('using flutter plugin', () async {
       final descriptor = d.dir('cache', [
-        packageWithPathDeps('my_package', dependencies: [
-          'my_dependency'
-        ], lib: [
-          d.file('my_package.dart', '''
+        packageWithPathDeps(
+          'my_package',
+          dependencies: [
+            'my_dependency',
+          ],
+          lib: [
+            d.file('my_package.dart', '''
 import "package:my_dependency/my_dependency.dart";
 import "dart:io";
 int fourtyTwo() => fourtyThree() - 1;
-''')
-        ]),
-        packageWithPathDeps('my_dependency', lib: [
-          d.file('my_dependency.dart', 'int fourtyThree() => 43;')
-        ], pubspecExtras: {
-          'environment': {'flutter': '>=1.2.0<=2.0.0'},
-          'flutter': {
-            'plugin': {
-              'platforms': {'web': {}, 'ios': {}}
-            }
-          }
-        }),
+'''),
+          ],
+        ),
+        packageWithPathDeps(
+          'my_dependency',
+          lib: [
+            d.file('my_dependency.dart', 'int fourtyThree() => 43;'),
+          ],
+          pubspecExtras: {
+            'environment': {'flutter': '>=1.2.0<=2.0.0'},
+            'flutter': {
+              'plugin': {
+                'platforms': {'web': {}, 'ios': {}},
+              },
+            },
+          },
+        ),
       ]);
       await descriptor.create();
       final tagger = Tagger(p.join(descriptor.io.path, 'my_package'));
@@ -204,25 +254,33 @@ int fourtyTwo() => fourtyThree() - 1;
     });
     test('using flutter plugin2', () async {
       final descriptor = d.dir('cache', [
-        packageWithPathDeps('my_package', dependencies: [
-          'my_dependency'
-        ], lib: [
-          d.file('my_package.dart', '''
+        packageWithPathDeps(
+          'my_package',
+          dependencies: [
+            'my_dependency',
+          ],
+          lib: [
+            d.file('my_package.dart', '''
 import "package:my_dependency/my_dependency.dart";
 import "dart:html";
 int fourtyTwo() => fourtyThree() - 1;
-''')
-        ]),
-        packageWithPathDeps('my_dependency', lib: [
-          d.file('my_dependency.dart', 'int fourtyThree() => 43;')
-        ], pubspecExtras: {
-          'environment': {'flutter': '>=1.2.0<=2.0.0'},
-          'flutter': {
-            'plugin': {
-              'platforms': {'web': {}, 'ios': {}}
-            }
-          }
-        }),
+'''),
+          ],
+        ),
+        packageWithPathDeps(
+          'my_dependency',
+          lib: [
+            d.file('my_dependency.dart', 'int fourtyThree() => 43;'),
+          ],
+          pubspecExtras: {
+            'environment': {'flutter': '>=1.2.0<=2.0.0'},
+            'flutter': {
+              'plugin': {
+                'platforms': {'web': {}, 'ios': {}},
+              },
+            },
+          },
+        ),
       ]);
       await descriptor.create();
       final tagger = Tagger(p.join(descriptor.io.path, 'my_package'));
@@ -233,47 +291,59 @@ int fourtyTwo() => fourtyThree() - 1;
     });
     test('Flutter plugins declarations are respected', () async {
       final decriptor = d.dir('cache', [
-        packageWithPathDeps('my_package', lib: [
-          d.file('my_package.dart', '''
+        packageWithPathDeps(
+          'my_package',
+          lib: [
+            d.file('my_package.dart', '''
 import 'dart:io';
 import 'package:my_package_linux/my_package_linux.dart';
 int fourtyTwo() => 42;
 '''),
-        ], pubspecExtras: {
-          'environment': {'flutter': '>=1.2.0<=2.0.0'},
-          'flutter': {
-            'plugin': {
-              'platforms': {'web': {}, 'ios': {}}
-            }
-          }
-        }, dependencies: [
-          'my_package_linux'
-        ], extraFiles: [
-          d.file('.packages', '''
+          ],
+          pubspecExtras: {
+            'environment': {'flutter': '>=1.2.0<=2.0.0'},
+            'flutter': {
+              'plugin': {
+                'platforms': {'web': {}, 'ios': {}},
+              },
+            },
+          },
+          dependencies: [
+            'my_package_linux',
+          ],
+          extraFiles: [
+            d.file('.packages', '''
 my_package:lib/
 my_package_linux:../my_package_linux/lib/
 '''),
-        ]),
-        packageWithPathDeps('my_package_linux', lib: [
-          d.file('my_package_linux.dart', '''
+          ],
+        ),
+        packageWithPathDeps(
+          'my_package_linux',
+          lib: [
+            d.file('my_package_linux.dart', '''
 import 'dart:io';
 int fourtyTwo() => 42;
 '''),
-        ], pubspecExtras: {
-          'environment': {'flutter': '>=1.2.0<=2.0.0'},
-          'flutter': {
-            'plugin': {
-              'platforms': {'web': {}, 'linux': {}}
-            }
-          }
-        })
+          ],
+          pubspecExtras: {
+            'environment': {'flutter': '>=1.2.0<=2.0.0'},
+            'flutter': {
+              'plugin': {
+                'platforms': {'web': {}, 'linux': {}},
+              },
+            },
+          },
+        ),
       ]);
 
       await decriptor.create();
       final tagger = Tagger('${decriptor.io.path}/my_package');
       _expectTagging(tagger.sdkTags, tags: {'sdk:flutter'});
-      _expectTagging(tagger.platformTags,
-          tags: {'platform:ios', 'platform:web'});
+      _expectTagging(
+        tagger.platformTags,
+        tags: {'platform:ios', 'platform:web'},
+      );
       _expectTagging(tagger.runtimeTags, tags: isEmpty);
       _expectTagging(tagger.flutterPluginTags, tags: {'is:plugin'});
     });
@@ -296,40 +366,53 @@ int fourtyTwo() => 42;
       await decriptor.create();
       final tagger = Tagger('${decriptor.io.path}/my_package');
       _expectTagging(tagger.sdkTags, tags: {'sdk:flutter', 'sdk:dart'});
-      _expectTagging(tagger.platformTags,
-          tags: {'platform:windows', 'platform:android'});
-      _expectTagging(tagger.runtimeTags,
-          tags: ['runtime:native-aot', 'runtime:native-jit', 'runtime:web']);
+      _expectTagging(
+        tagger.platformTags,
+        tags: {'platform:windows', 'platform:android'},
+      );
+      _expectTagging(
+        tagger.runtimeTags,
+        tags: ['runtime:native-aot', 'runtime:native-jit', 'runtime:web'],
+      );
       _expectTagging(tagger.flutterPluginTags, tags: isEmpty);
     });
 
     test('Top-level platforms in dependency', () async {
       final decriptor = d.dir('cache', [
-        packageWithPathDeps('my_package', lib: [
-          d.file('my_package.dart', '''
+        packageWithPathDeps(
+          'my_package',
+          lib: [
+            d.file('my_package.dart', '''
 import 'dart:io';
 import 'package:my_package_linux/my_package_linux.dart';
 int fourtyTwo() => 42;
 '''),
-        ], dependencies: [
-          'my_package_linux'
-        ], extraFiles: [
-          d.file('.packages', '''
+          ],
+          dependencies: [
+            'my_package_linux',
+          ],
+          extraFiles: [
+            d.file('.packages', '''
 my_package:lib/
 my_package_linux:../my_package_linux/lib/
 '''),
-        ]),
-        packageWithPathDeps('my_package_linux', lib: [
-          d.file('my_package_linux.dart', '''
+          ],
+        ),
+        packageWithPathDeps(
+          'my_package_linux',
+          lib: [
+            d.file('my_package_linux.dart', '''
 import 'dart:io';
 int fourtyTwo() => 42;
 '''),
-        ], pubspecExtras: {
-          'environment': {'flutter': '>=1.2.0<=2.0.0'},
-          'platforms': {
-            'linux': null,
-          }
-        })
+          ],
+          pubspecExtras: {
+            'environment': {'flutter': '>=1.2.0<=2.0.0'},
+            'platforms': {
+              'linux': null,
+            },
+          },
+        ),
       ]);
 
       await decriptor.create();
@@ -349,53 +432,72 @@ int fourtyTwo() => 42;
 import "package:my_dependency/my_dependency.dart";
 import "dart:io";
 int fourtyTwo() => fourtyThree() - 1;
-''')
+'''),
           ],
           dependencies: ['my_dependency'],
         ),
-        packageWithPathDeps('my_dependency', lib: [
-          d.file('my_dependency.dart', '''
+        packageWithPathDeps(
+          'my_dependency',
+          lib: [
+            d.file('my_dependency.dart', '''
 import 'dart:mirrors';
 int fourtyThree() => 43;
 '''),
-          d.file('my_dependency_web.dart', '''
+            d.file('my_dependency_web.dart', '''
 import 'dart:js';
 int fourtyThree() => 43;
 '''),
-        ]),
+          ],
+        ),
       ]);
       await descriptor.create();
       final tagger = Tagger('${descriptor.io.path}/my_package');
-      _expectTagging(tagger.sdkTags, tags: {
-        'sdk:dart'
-      }, explanations: [
-        _explanation(
+      _expectTagging(
+        tagger.sdkTags,
+        tags: {
+          'sdk:dart',
+        },
+        explanations: [
+          _explanation(
             finding: 'Package is not compatible with the Flutter SDK.',
             explanation: startsWith(
-                'Package is not compatible with the Flutter SDK. Because:')),
-      ]);
-      _expectTagging(tagger.platformTags,
-          tags: {'platform:linux', 'platform:macos', 'platform:windows'},
-          explanations: contains(
-            _explanation(
-                finding: 'Package not compatible with platform Android'),
-          ));
-      _expectTagging(tagger.runtimeTags, tags: {
-        'runtime:native-jit'
-      }, explanations: {
-        _explanation(
+              'Package is not compatible with the Flutter SDK. Because:',
+            ),
+          ),
+        ],
+      );
+      _expectTagging(
+        tagger.platformTags,
+        tags: {'platform:linux', 'platform:macos', 'platform:windows'},
+        explanations: contains(
+          _explanation(
+            finding: 'Package not compatible with platform Android',
+          ),
+        ),
+      );
+      _expectTagging(
+        tagger.runtimeTags,
+        tags: {
+          'runtime:native-jit',
+        },
+        explanations: {
+          _explanation(
             finding: 'Package not compatible with runtime native-aot',
             explanation: '''
 Because:
 * `package:my_package/my_package.dart` that imports:
 * `package:my_dependency/my_dependency.dart` that imports:
-* `dart:mirrors`'''),
-        _explanation(
-            finding: 'Package not compatible with runtime js', explanation: '''
+* `dart:mirrors`''',
+          ),
+          _explanation(
+            finding: 'Package not compatible with runtime js',
+            explanation: '''
 Because:
 * `package:my_package/my_package.dart` that imports:
-* `dart:io`''')
-      });
+* `dart:io`''',
+          ),
+        },
+      );
       _expectTagging(tagger.flutterPluginTags, tags: isEmpty);
     });
 
@@ -407,38 +509,48 @@ Because:
             d.file('my_package.dart', '''
 import "package:my_dependency/my_dependency.dart" if (dart.library.js) "package:my_dependency/my_dependency_web.dart";;
 int fourtyTwo() => fourtyThree() - 1;
-''')
+'''),
           ],
           dependencies: ['my_dependency'],
         ),
-        packageWithPathDeps('my_dependency', lib: [
-          d.file('my_dependency.dart', '''
+        packageWithPathDeps(
+          'my_dependency',
+          lib: [
+            d.file('my_dependency.dart', '''
 import 'dart:io';
 int fourtyThree() => 43;
 '''),
-          d.file('my_dependency_web.dart', '''
+            d.file('my_dependency_web.dart', '''
 import 'dart:js';
 int fourtyThree() => 43;
 '''),
-        ]),
+          ],
+        ),
       ]);
       await descriptor.create();
       final tagger = Tagger('${descriptor.io.path}/my_package');
-      _expectTagging(tagger.sdkTags,
-          tags: {'sdk:dart', 'sdk:flutter'}, explanations: isEmpty);
-      _expectTagging(tagger.platformTags,
-          tags: {
-            'platform:android',
-            'platform:ios',
-            'platform:windows',
-            'platform:linux',
-            'platform:macos',
-            'platform:web'
-          },
-          explanations: isEmpty);
-      _expectTagging(tagger.runtimeTags,
-          tags: {'runtime:native-aot', 'runtime:native-jit', 'runtime:web'},
-          explanations: isEmpty);
+      _expectTagging(
+        tagger.sdkTags,
+        tags: {'sdk:dart', 'sdk:flutter'},
+        explanations: isEmpty,
+      );
+      _expectTagging(
+        tagger.platformTags,
+        tags: {
+          'platform:android',
+          'platform:ios',
+          'platform:windows',
+          'platform:linux',
+          'platform:macos',
+          'platform:web',
+        },
+        explanations: isEmpty,
+      );
+      _expectTagging(
+        tagger.runtimeTags,
+        tags: {'runtime:native-aot', 'runtime:native-jit', 'runtime:web'},
+        explanations: isEmpty,
+      );
       _expectTagging(tagger.flutterPluginTags, tags: isEmpty);
     });
 
@@ -472,60 +584,76 @@ int fourtyTwo() => 42;
             '''
 name: my_package
 ''',
-          )
-        ])
+          ),
+        ]),
       ]);
       await descriptor.create();
       final tagger = Tagger('${descriptor.io.path}/my_package');
-      _expectTagging(tagger.sdkTags,
-          tags: {'sdk:dart', 'sdk:flutter'}, explanations: isEmpty);
-      _expectTagging(tagger.platformTags,
-          tags: {
-            'platform:ios',
-            'platform:android',
-            'platform:web',
-            'platform:linux',
-            'platform:windows',
-            'platform:macos'
-          },
-          explanations: isEmpty);
+      _expectTagging(
+        tagger.sdkTags,
+        tags: {'sdk:dart', 'sdk:flutter'},
+        explanations: isEmpty,
+      );
+      _expectTagging(
+        tagger.platformTags,
+        tags: {
+          'platform:ios',
+          'platform:android',
+          'platform:web',
+          'platform:linux',
+          'platform:windows',
+          'platform:macos',
+        },
+        explanations: isEmpty,
+      );
 
-      _expectTagging(tagger.runtimeTags,
-          tags: {
-            'runtime:native-jit',
-            'runtime:native-aot',
-            'runtime:web',
-          },
-          explanations: isEmpty);
+      _expectTagging(
+        tagger.runtimeTags,
+        tags: {
+          'runtime:native-jit',
+          'runtime:native-aot',
+          'runtime:web',
+        },
+        explanations: isEmpty,
+      );
       _expectTagging(tagger.flutterPluginTags, tags: isEmpty);
     });
 
     test('no dart files', () async {
       final descriptor = d.dir('cache', [
-        packageWithPathDeps('my_package',
-            lib: [d.file('asset.json', '{"status": "ok"}')])
+        packageWithPathDeps(
+          'my_package',
+          lib: [d.file('asset.json', '{"status": "ok"}')],
+        ),
       ]);
       await descriptor.create();
       final tagger = Tagger(p.join(descriptor.io.path, 'my_package'));
-      _expectTagging(tagger.sdkTags,
-          tags: {'sdk:dart', 'sdk:flutter'}, explanations: isEmpty);
-      _expectTagging(tagger.platformTags,
-          tags: {
-            'platform:ios',
-            'platform:android',
-            'platform:web',
-            'platform:linux',
-            'platform:windows',
-            'platform:macos'
-          },
-          explanations: isEmpty);
-      _expectTagging(tagger.runtimeTags,
-          tags: {
-            'runtime:native-jit',
-            'runtime:native-aot',
-            'runtime:web',
-          },
-          explanations: isEmpty);
+      _expectTagging(
+        tagger.sdkTags,
+        tags: {'sdk:dart', 'sdk:flutter'},
+        explanations: isEmpty,
+      );
+      _expectTagging(
+        tagger.platformTags,
+        tags: {
+          'platform:ios',
+          'platform:android',
+          'platform:web',
+          'platform:linux',
+          'platform:windows',
+          'platform:macos',
+        },
+        explanations: isEmpty,
+      );
+      _expectTagging(
+        tagger.runtimeTags,
+        tags: {
+          'runtime:native-jit',
+          'runtime:native-aot',
+          'runtime:web',
+        },
+        explanations: isEmpty,
+      );
       _expectTagging(tagger.flutterPluginTags, tags: isEmpty);
     });
     test('no dart files with Flutter plugins declarations', () async {
@@ -537,9 +665,9 @@ name: my_package
             'environment': {'flutter': '>=1.2.0<=2.0.0'},
             'flutter': {
               'plugin': {
-                'platforms': {'web': {}, 'ios': {}}
-              }
-            }
+                'platforms': {'web': {}, 'ios': {}},
+              },
+            },
           },
         ),
       ]);
@@ -547,10 +675,13 @@ name: my_package
       await decriptor.create();
       final tagger = Tagger('${decriptor.io.path}/my_package');
       _expectTagging(tagger.sdkTags, tags: {'sdk:flutter'});
-      _expectTagging(tagger.platformTags, tags: {
-        'platform:ios',
-        'platform:web',
-      });
+      _expectTagging(
+        tagger.platformTags,
+        tags: {
+          'platform:ios',
+          'platform:web',
+        },
+      );
       _expectTagging(tagger.runtimeTags, tags: isEmpty);
       _expectTagging(tagger.flutterPluginTags, tags: {'is:plugin'});
     });

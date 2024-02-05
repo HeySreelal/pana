@@ -98,7 +98,9 @@ class BatchRunCommand extends Command {
   }
 
   Future<ToolEnvironment> _initToolEnv(
-      BatchConfig config, String pubCache) async {
+    BatchConfig config,
+    String pubCache,
+  ) async {
     return await ToolEnvironment.create(
       dartSdkConfig: SdkConfig(
         rootPath: config.dartSdk,

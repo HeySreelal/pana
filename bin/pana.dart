@@ -32,28 +32,41 @@ final _parser = ArgParser()
         'The config home directory where the Flutter SDK may store its settings.',
     hide: true,
   )
-  ..addOption('exit-code-threshold',
-      help:
-          'The exit code will indicate if (max - granted points) <= threshold.')
-  ..addFlag('json',
-      abbr: 'j',
-      help: 'Output log records and full report as JSON.',
-      defaultsTo: false,
-      negatable: false)
-  ..addOption('source',
-      abbr: 's',
-      help:
-          'The source where the package is located (hosted on $defaultHostedUrl, or local directory path).',
-      allowed: ['hosted', 'path'],
-      defaultsTo: 'path',
-      hide: true)
-  ..addOption('hosted-url',
-      help: 'The server that hosts <package>.', defaultsTo: defaultHostedUrl)
-  ..addOption('line-length',
-      abbr: 'l', help: 'The line length to use with dart format.')
-  ..addFlag('hosted',
-      help: 'Download and analyze a hosted package (from $defaultHostedUrl).',
-      negatable: false)
+  ..addOption(
+    'exit-code-threshold',
+    help: 'The exit code will indicate if (max - granted points) <= threshold.',
+  )
+  ..addFlag(
+    'json',
+    abbr: 'j',
+    help: 'Output log records and full report as JSON.',
+    defaultsTo: false,
+    negatable: false,
+  )
+  ..addOption(
+    'source',
+    abbr: 's',
+    help:
+        'The source where the package is located (hosted on $defaultHostedUrl, or local directory path).',
+    allowed: ['hosted', 'path'],
+    defaultsTo: 'path',
+    hide: true,
+  )
+  ..addOption(
+    'hosted-url',
+    help: 'The server that hosts <package>.',
+    defaultsTo: defaultHostedUrl,
+  )
+  ..addOption(
+    'line-length',
+    abbr: 'l',
+    help: 'The line length to use with dart format.',
+  )
+  ..addFlag(
+    'hosted',
+    help: 'Download and analyze a hosted package (from $defaultHostedUrl).',
+    negatable: false,
+  )
   ..addFlag(
     'dartdoc',
     help: 'Run dartdoc and score the package on documentation coverage.',
@@ -173,8 +186,9 @@ Future main(List<String> args) async {
   final runDartdoc = result['dartdoc'] == true;
   if (!runDartdoc && dartdocOutputDirParam != null) {
     _printHelp(
-        errorMessage:
-            'Must not disable dartdoc when --dartdoc-output is specified.');
+      errorMessage:
+          'Must not disable dartdoc when --dartdoc-output is specified.',
+    );
   }
   final resourcesOutputDirParam = result['resources-output'] as String?;
 
@@ -192,20 +206,22 @@ Future main(List<String> args) async {
 
   try {
     final pubHostedUrl = result['hosted-url'] as String?;
-    final analyzer = PackageAnalyzer(await ToolEnvironment.create(
-      pubCacheDir: pubCacheDir,
-      panaCacheDir: Platform.environment['PANA_CACHE'],
-      dartSdkConfig: SdkConfig(
-        rootPath: result['dart-sdk'] as String?,
-        configHomePath: result['dart-config-home'] as String?,
+    final analyzer = PackageAnalyzer(
+      await ToolEnvironment.create(
+        pubCacheDir: pubCacheDir,
+        panaCacheDir: Platform.environment['PANA_CACHE'],
+        dartSdkConfig: SdkConfig(
+          rootPath: result['dart-sdk'] as String?,
+          configHomePath: result['dart-config-home'] as String?,
+        ),
+        flutterSdkConfig: SdkConfig(
+          rootPath: result['flutter-sdk'] as String?,
+          configHomePath: result['flutter-config-home'] as String?,
+        ),
+        pubHostedUrl: pubHostedUrl,
+        dartdocVersion: result['dartdoc-version'] as String?,
       ),
-      flutterSdkConfig: SdkConfig(
-        rootPath: result['flutter-sdk'] as String?,
-        configHomePath: result['flutter-config-home'] as String?,
-      ),
-      pubHostedUrl: pubHostedUrl,
-      dartdocVersion: result['dartdoc-version'] as String?,
-    ));
+    );
     final options = InspectOptions(
       pubHostedUrl: pubHostedUrl,
       lineLength: int.tryParse(result['line-length'] as String? ?? ''),
@@ -227,8 +243,9 @@ Future main(List<String> args) async {
         }
         if (pubHostedUrl != defaultHostedUrl && version == null) {
           _printHelp(
-              errorMessage:
-                  'Version must be specified when using --hosted-url option.');
+            errorMessage:
+                'Version must be specified when using --hosted-url option.',
+          );
         }
         summary = await analyzer.inspectPackage(
           package,
@@ -287,10 +304,11 @@ Future main(List<String> args) async {
 void _logWriter(log.LogRecord record) {
   var wroteHeader = false;
 
-  var msg = LineSplitter.split([record.message, record.error, record.stackTrace]
-          .where((e) => e != null)
-          .join('\n'))
-      .map((l) {
+  var msg = LineSplitter.split(
+    [record.message, record.error, record.stackTrace]
+        .where((e) => e != null)
+        .join('\n'),
+  ).map((l) {
     String prefix;
     if (wroteHeader) {
       prefix = '';
@@ -315,7 +333,8 @@ void _logWriter(log.LogRecord record) {
 Stream<ProcessSignal> _getSignals() => Platform.isWindows
     ? ProcessSignal.sigint.watch()
     : StreamGroup.merge(
-        [ProcessSignal.sigterm.watch(), ProcessSignal.sigint.watch()]);
+        [ProcessSignal.sigterm.watch(), ProcessSignal.sigint.watch()],
+      );
 
 Duration? _parseDuration(String? value) {
   if (value == null || value.isEmpty) return null;

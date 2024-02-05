@@ -23,9 +23,11 @@ class LicenseTags {
   factory LicenseTags.fromLicenses(List<License> licenses) {
     final tags = <String>[];
     if (licenses.isNotEmpty) {
-      tags.addAll(licenses
-          .map((l) => 'license:${l.spdxIdentifier.toLowerCase()}')
-          .toSet());
+      tags.addAll(
+        licenses
+            .map((l) => 'license:${l.spdxIdentifier.toLowerCase()}')
+            .toSet(),
+      );
       if (licenses.every((l) => l.isFsfLibre)) {
         tags.add(PanaTags.licenceFsfLibre);
       }

@@ -241,7 +241,8 @@ List<License> loadLicensesFromDirectories(Iterable<String> directories) {
         licenses.addAll(license);
       } else {
         throw FormatException(
-            'Invalid file type:\nExpected: "spdx-identifier" Actual: ${file.uri.pathSegments.last}');
+          'Invalid file type:\nExpected: "spdx-identifier" Actual: ${file.uri.pathSegments.last}',
+        );
       }
     });
   }
@@ -269,7 +270,8 @@ List<License> licensesFromFile(String path) {
 
   if (_invalidIdentifier.hasMatch(identifier)) {
     throw ArgumentError(
-        'Invalid file name: expected: "path/to/file/<spdx-identifier>.txt" actual: $path');
+      'Invalid file name: expected: "path/to/file/<spdx-identifier>.txt" actual: $path',
+    );
   }
 
   licenses.add(License.parse(identifier: identifier, content: content));

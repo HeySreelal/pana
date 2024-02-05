@@ -17,7 +17,8 @@ final _dartdocSubsectionHeadline =
     '20% or more of the public API has dartdoc comments';
 
 Future<PubDartdocData> generateAndSavePubDataJson(
-    String dartdocOutputDir) async {
+  String dartdocOutputDir,
+) async {
   final content =
       await File(p.join(dartdocOutputDir, 'index.json')).readAsString();
   final index = DartdocIndex.parseJsonText(content);
@@ -38,7 +39,8 @@ Subsection dartdocFailedSubsection(String reason) {
 }
 
 Future<Subsection> createDocumentationCoverageSection(
-    PubDartdocData data) async {
+  PubDartdocData data,
+) async {
   final documented = data.coverage?.documented ?? 0;
   final total = data.coverage?.total ?? 0;
   final symbolsMissingDocumentation =
@@ -51,7 +53,8 @@ Future<Subsection> createDocumentationCoverageSection(
   final summary = StringBuffer();
   final grantedPoints = accepted ? maxPoints : 0;
   summary.write(
-      '$documented out of $total API elements ($percent %) have documentation comments.');
+    '$documented out of $total API elements ($percent %) have documentation comments.',
+  );
 
   if (!accepted) {
     summary.write('\n\n'

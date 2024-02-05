@@ -15,8 +15,11 @@ import 'package:yaml/yaml.dart';
 
 import 'logging.dart';
 
-Stream<String> listFiles(String directory,
-    {String? endsWith, bool deleteBadExtracted = false}) {
+Stream<String> listFiles(
+  String directory, {
+  String? endsWith,
+  bool deleteBadExtracted = false,
+}) {
   var dir = Directory(directory);
   return dir
       .list(recursive: true)
@@ -64,8 +67,10 @@ dynamic sortedJson(obj) {
 
 dynamic _toSortedMap(dynamic item) {
   if (item is Map) {
-    return SplayTreeMap<String, dynamic>.fromIterable(item.keys,
-        value: (k) => _toSortedMap(item[k]));
+    return SplayTreeMap<String, dynamic>.fromIterable(
+      item.keys,
+      value: (k) => _toSortedMap(item[k]),
+    );
   } else if (item is List) {
     return item.map(_toSortedMap).toList();
   } else {

@@ -36,19 +36,29 @@ class ExctractedMarkdownContent {
 
 /// Scans a markdown text and extracts its content.
 ExctractedMarkdownContent _scanMarkdownText(
-    String text, Uri sourceUrl, bool isMalformedUtf8) {
+  String text,
+  Uri sourceUrl,
+  bool isMalformedUtf8,
+) {
   final htmlText = markdownToHtml(text);
-  final html = html_parser.parseFragment(htmlText,
-      sourceUrl: sourceUrl.toString(), generateSpans: true);
+  final html = html_parser.parseFragment(
+    htmlText,
+    sourceUrl: sourceUrl.toString(),
+    generateSpans: true,
+  );
   return ExctractedMarkdownContent(
-    images: _unique(html
-        .querySelectorAll('img')
-        .where((e) => e.attributes.containsKey('src'))
-        .map((e) => Link(e.attributes['src']!, e.sourceSpan))),
-    links: _unique(html
-        .querySelectorAll('a')
-        .where((e) => e.attributes.containsKey('href'))
-        .map((e) => Link(e.attributes['href']!, e.sourceSpan))),
+    images: _unique(
+      html
+          .querySelectorAll('img')
+          .where((e) => e.attributes.containsKey('src'))
+          .map((e) => Link(e.attributes['src']!, e.sourceSpan)),
+    ),
+    links: _unique(
+      html
+          .querySelectorAll('a')
+          .where((e) => e.attributes.containsKey('href'))
+          .map((e) => Link(e.attributes['href']!, e.sourceSpan)),
+    ),
     isMalformedUtf8: isMalformedUtf8,
     nonAsciiRatio: nonAsciiRuneRatio(text),
   );

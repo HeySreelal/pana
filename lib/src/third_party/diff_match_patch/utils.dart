@@ -414,8 +414,10 @@ void diffCleanupSemantic(List<Diff> diffs) {
             Diff(Operation.equal, deletion.substring(0, overlapLength2)),
           );
 
-          diffs[pointer - 1] = Diff(Operation.insert,
-              insertion.substring(0, insertion.length - overlapLength2));
+          diffs[pointer - 1] = Diff(
+            Operation.insert,
+            insertion.substring(0, insertion.length - overlapLength2),
+          );
 
           diffs[pointer + 1] =
               Diff(Operation.delete, deletion.substring(overlapLength2));

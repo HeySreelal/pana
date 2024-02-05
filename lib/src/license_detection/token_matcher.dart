@@ -24,12 +24,13 @@ class MatchRange {
     this.tokensClaimed,
   );
 
-  MatchRange update(
-      {int? inputStart,
-      int? inputEnd,
-      int? srcStart,
-      int? srcEnd,
-      int? newClaim}) {
+  MatchRange update({
+    int? inputStart,
+    int? inputEnd,
+    int? srcStart,
+    int? srcEnd,
+    int? newClaim,
+  }) {
     final newInput = Range(inputStart ?? input.start, inputEnd ?? input.end);
     final newSource = Range(srcStart ?? source.start, srcEnd ?? source.end);
     return MatchRange(newInput, newSource, newClaim ?? tokensClaimed);
@@ -70,7 +71,8 @@ List<MatchRange> findPotentialMatches(
 ) {
   if (knownLicense.granularity != unknownLicense.granularity) {
     throw ArgumentError(
-        'n-gram size for knownLicense and unknownLicense must be the same!');
+      'n-gram size for knownLicense and unknownLicense must be the same!',
+    );
   }
 
   final matchedRanges = getMatchRanges(
@@ -122,7 +124,12 @@ List<MatchRange> getMatchRanges(
   }
 
   return fuseMatchedRanges(
-      matches, confidence, source.tokens.length, runs, input.tokens.length);
+    matches,
+    confidence,
+    source.tokens.length,
+    runs,
+    input.tokens.length,
+  );
 }
 
 /// Returns a list of [MatchRange] for all the continuous range of [Ngram](s) matched in [unknownLicense] and [knownLicense].
@@ -162,8 +169,11 @@ List<MatchRange> getTargetMatchedRanges(
       // Add new instance of matchRange if doesn't extend the last
       // match of the same offset.
       offsetMap.putIfAbsent(offset, () => []).add(
-            MatchRange(Range(tgtChecksum.start, tgtChecksum.end),
-                Range(srcChecksum.start, srcChecksum.end), n),
+            MatchRange(
+              Range(tgtChecksum.start, tgtChecksum.end),
+              Range(srcChecksum.start, srcChecksum.end),
+              n,
+            ),
           );
     }
   }
@@ -259,7 +269,7 @@ List<Range> detectRuns(
     Range(
       out[0],
       out[0] + n,
-    )
+    ),
   ];
 
   // Create a list of matchRange from the token indexes that were

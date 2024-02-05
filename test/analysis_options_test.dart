@@ -11,7 +11,9 @@ import 'package:yaml/yaml.dart' as yaml;
 void main() {
   test('default options', () async {
     final content = await getDefaultAnalysisOptionsYaml(
-        usesFlutter: false, flutterSdkDir: null);
+      usesFlutter: false,
+      flutterSdkDir: null,
+    );
     expect(content, contains('linter:'));
     expect(content, contains('rules:'));
     expect(content, contains('avoid_empty_else'));
@@ -25,7 +27,9 @@ void main() {
 
   test('default Flutter options', () async {
     final content = await getDefaultAnalysisOptionsYaml(
-        usesFlutter: true, flutterSdkDir: null);
+      usesFlutter: true,
+      flutterSdkDir: null,
+    );
     expect(json.decode(json.encode(yaml.loadYaml(content))), {
       'analyzer': {
         'errors': {
@@ -44,12 +48,15 @@ void main() {
   });
 
   test('passthrough for some options', () {
-    final content = updatePassthroughOptions(original: '''
+    final content = updatePassthroughOptions(
+      original: '''
 analyzer:
   errors:
     todo: ignore
     uri_has_not_been_generated: ignore
-''', custom: '');
+''',
+      custom: '',
+    );
     expect(json.decode(content), {
       'analyzer': {
         'errors': {

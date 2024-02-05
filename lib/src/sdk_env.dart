@@ -98,8 +98,10 @@ class ToolEnvironment {
     required PanaRuntimeInfo runtimeInfo,
   })  : panaCache = panaCache ?? PanaCache(),
         _dartSdk = _DartSdk._(SdkConfig(environment: environment)),
-        _flutterSdk = _FlutterSdk._(SdkConfig(environment: environment),
-            _DartSdk._(SdkConfig(environment: environment))),
+        _flutterSdk = _FlutterSdk._(
+          SdkConfig(environment: environment),
+          _DartSdk._(SdkConfig(environment: environment)),
+        ),
         _dartdocVersion = null,
         _runtimeInfo = runtimeInfo;
 
@@ -199,7 +201,9 @@ class ToolEnvironment {
       flutterSdkDir: _flutterSdk._config.rootPath,
     );
     final customOptionsContent = updatePassthroughOptions(
-        original: originalOptions, custom: rawOptionsContent);
+      original: originalOptions,
+      custom: rawOptionsContent,
+    );
     try {
       await analysisOptionsFile.writeAsString(customOptionsContent);
       final proc = await runConstrained(
@@ -211,7 +215,9 @@ class ToolEnvironment {
       );
       if (proc.wasOutputExceeded) {
         throw ToolException(
-            'Running `dart analyze` produced too large output.', proc);
+          'Running `dart analyze` produced too large output.',
+          proc,
+        );
       }
       final output = proc.asJoinedOutput;
       if (proc.wasTimeout) {
@@ -237,8 +243,11 @@ class ToolEnvironment {
     }
   }
 
-  Future<List<String>> filesNeedingFormat(String packageDir, bool usesFlutter,
-      {int? lineLength}) async {
+  Future<List<String>> filesNeedingFormat(
+    String packageDir,
+    bool usesFlutter, {
+    int? lineLength,
+  }) async {
     final dirs = await listFocusDirs(packageDir);
     if (dirs.isEmpty) {
       return const [];
@@ -283,7 +292,8 @@ class ToolEnvironment {
 
       final errorMsg = LineSplitter.split(output).take(10).join('\n');
       final isUserProblem = output.contains(
-              'Could not format because the source could not be parsed') ||
+            'Could not format because the source could not be parsed',
+          ) ||
           output.contains('The formatter produced unexpected output.');
       if (!isUserProblem) {
         throw Exception(
@@ -301,16 +311,18 @@ class ToolEnvironment {
       throwOnError: true,
     );
     final waitingForString = 'Waiting for another flutter';
-    return result.parseJson(transform: (content) {
-      if (content.contains(waitingForString)) {
-        return content
-            .split('\n')
-            .where((e) => !e.contains(waitingForString))
-            .join('\n');
-      } else {
-        return content;
-      }
-    });
+    return result.parseJson(
+      transform: (content) {
+        if (content.contains(waitingForString)) {
+          return content
+              .split('\n')
+              .where((e) => !e.contains(waitingForString))
+              .join('\n');
+        } else {
+          return content;
+        }
+      },
+    );
   }
 
   Future<PanaProcessResult> runUpgrade(
@@ -537,7 +549,8 @@ class ToolEnvironment {
   Future<File> _stripAndAugmentPubspecYaml(String packageDir) async {
     final now = DateTime.now();
     final backup = File(
-        p.join(packageDir, 'pana-${now.millisecondsSinceEpoch}-pubspec.yaml'));
+      p.join(packageDir, 'pana-${now.millisecondsSinceEpoch}-pubspec.yaml'),
+    );
 
     final pubspec = File(p.join(packageDir, 'pubspec.yaml'));
     final original = await pubspec.readAsString();
@@ -627,7 +640,9 @@ class _DartSdk {
   _DartSdk._(this._config);
 
   static Future<_DartSdk> detect(
-      SdkConfig config, Map<String, String> environment) async {
+    SdkConfig config,
+    Map<String, String> environment,
+  ) async {
     final resolved = await config._resolveAndExtend(environment: environment);
     return _DartSdk._(resolved);
   }
@@ -647,7 +662,9 @@ class _FlutterSdk {
   _FlutterSdk._(this._config, this._dartSdk);
 
   static Future<_FlutterSdk> detect(
-      SdkConfig config, Map<String, String> environment) async {
+    SdkConfig config,
+    Map<String, String> environment,
+  ) async {
     final resolved = await config._resolveAndExtend(
       environment: environment,
       isFlutterSdk: true,

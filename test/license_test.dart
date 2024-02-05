@@ -23,9 +23,12 @@ void main() {
   group('AGPL', () {
     test('explicit', () async {
       expect(
-          await detectLicenseInContent('GNU AFFERO GENERAL PUBLIC LICENSE',
-              relativePath: 'LICENSE'),
-          []);
+        await detectLicenseInContent(
+          'GNU AFFERO GENERAL PUBLIC LICENSE',
+          relativePath: 'LICENSE',
+        ),
+        [],
+      );
       await expectFile('test/licenses/agpl_v3.txt', ['AGPL-3.0']);
     });
   });
@@ -33,10 +36,12 @@ void main() {
   group('Apache', () {
     test('explicit', () async {
       expect(
-          await detectLicenseInContent(
-              '   Apache License\n     Version 2.0, January 2004\n',
-              relativePath: 'LICENSE'),
-          []);
+        await detectLicenseInContent(
+          '   Apache License\n     Version 2.0, January 2004\n',
+          relativePath: 'LICENSE',
+        ),
+        [],
+      );
       await expectFile('test/licenses/apache_v2.txt', ['Apache-2.0']);
     });
   });
@@ -45,7 +50,9 @@ void main() {
     test('explicit', () async {
       await expectFile('test/licenses/bsd_2_clause.txt', ['BSD-2-Clause']);
       await expectFile(
-          'test/licenses/bsd_2_clause_in_comments.txt', ['BSD-2-Clause']);
+        'test/licenses/bsd_2_clause_in_comments.txt',
+        ['BSD-2-Clause'],
+      );
       await expectFile('test/licenses/bsd_3_clause.txt', ['unknown']);
       await expectFile('test/licenses/bsd_revised.txt', ['BSD-3-Clause']);
     });
@@ -54,14 +61,19 @@ void main() {
   group('GPL', () {
     test('explicit', () async {
       expect(
-          await detectLicenseInContent(
-              ['GNU GENERAL PUBLIC LICENSE', 'Version 2, June 1991'].join('\n'),
-              relativePath: 'LICENSE'),
-          []);
+        await detectLicenseInContent(
+          ['GNU GENERAL PUBLIC LICENSE', 'Version 2, June 1991'].join('\n'),
+          relativePath: 'LICENSE',
+        ),
+        [],
+      );
       expect(
-          await detectLicenseInContent(['GNU GPL Version 2'].join('\n'),
-              relativePath: 'LICENSE'),
-          []);
+        await detectLicenseInContent(
+          ['GNU GPL Version 2'].join('\n'),
+          relativePath: 'LICENSE',
+        ),
+        [],
+      );
       await expectFile('test/licenses/gpl_v3.txt', ['GPL-3.0']);
     });
   });
@@ -69,10 +81,12 @@ void main() {
   group('LGPL', () {
     test('explicit', () async {
       expect(
-          await detectLicenseInContent(
-              '\nGNU LESSER GENERAL PUBLIC LICENSE\n    Version 3, 29 June 2007',
-              relativePath: 'LICENSE'),
-          []);
+        await detectLicenseInContent(
+          '\nGNU LESSER GENERAL PUBLIC LICENSE\n    Version 3, 29 June 2007',
+          relativePath: 'LICENSE',
+        ),
+        [],
+      );
       await expectFile('test/licenses/lgpl_v3.txt', ['LGPL-3.0']);
     });
   });
@@ -80,13 +94,19 @@ void main() {
   group('MIT', () {
     test('explicit', () async {
       expect(
-          await detectLicenseInContent('\n\n   The MIT license\n\n blah...',
-              relativePath: 'LICENSE'),
-          []);
+        await detectLicenseInContent(
+          '\n\n   The MIT license\n\n blah...',
+          relativePath: 'LICENSE',
+        ),
+        [],
+      );
       expect(
-          await detectLicenseInContent('MIT license\n\n blah...',
-              relativePath: 'LICENSE'),
-          []);
+        await detectLicenseInContent(
+          'MIT license\n\n blah...',
+          relativePath: 'LICENSE',
+        ),
+        [],
+      );
 
       await expectFile('test/licenses/mit.txt', ['MIT']);
       await expectFile('test/licenses/mit_without_mit.txt', ['MIT']);
@@ -96,10 +116,12 @@ void main() {
   group('MPL', () {
     test('explicit', () async {
       expect(
-          await detectLicenseInContent(
-              '\n\n   Mozilla Public License Version 2.0\n\n blah...',
-              relativePath: 'LICENSE'),
-          []);
+        await detectLicenseInContent(
+          '\n\n   Mozilla Public License Version 2.0\n\n blah...',
+          relativePath: 'LICENSE',
+        ),
+        [],
+      );
       await expectFile('test/licenses/mpl_v2.txt', ['MPL-2.0']);
     });
   });
@@ -107,10 +129,12 @@ void main() {
   group('Unlicense', () {
     test('explicit', () async {
       expect(
-          await detectLicenseInContent(
-              '\n\n   This is free and unencumbered software released into the public domain.\n',
-              relativePath: 'LICENSE'),
-          []);
+        await detectLicenseInContent(
+          '\n\n   This is free and unencumbered software released into the public domain.\n',
+          relativePath: 'LICENSE',
+        ),
+        [],
+      );
       await expectFile('test/licenses/unlicense.txt', ['Unlicense']);
     });
   });

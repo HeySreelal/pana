@@ -20,7 +20,8 @@ ProcessedScreenshot _$ProcessedScreenshotFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$ProcessedScreenshotToJson(
-        ProcessedScreenshot instance) =>
+  ProcessedScreenshot instance,
+) =>
     <String, dynamic>{
       'originalImage': instance.originalImage,
       'webpImage': instance.webpImage,
@@ -80,8 +81,10 @@ Map<String, dynamic> _$SummaryToJson(Summary instance) {
   writeNotNull('createdAt', instance.createdAt?.toIso8601String());
   val['runtimeInfo'] = instance.runtimeInfo.toJson();
   writeNotNull('packageName', instance.packageName);
-  writeNotNull('packageVersion',
-      const VersionConverter().toJson(instance.packageVersion));
+  writeNotNull(
+    'packageVersion',
+    const VersionConverter().toJson(instance.packageVersion),
+  );
   writeNotNull('pubspec', instance.pubspec?.toJson());
   writeNotNull('licenseFile', instance.licenseFile?.toJson());
   writeNotNull('licenses', instance.licenses?.map((e) => e.toJson()).toList());
@@ -89,10 +92,14 @@ Map<String, dynamic> _$SummaryToJson(Summary instance) {
   writeNotNull('tags', instance.tags);
   writeNotNull('report', instance.report?.toJson());
   writeNotNull(
-      'screenshots', instance.screenshots?.map((e) => e.toJson()).toList());
+    'screenshots',
+    instance.screenshots?.map((e) => e.toJson()).toList(),
+  );
   writeNotNull('result', instance.result?.toJson());
   writeNotNull(
-      'urlProblems', instance.urlProblems?.map((e) => e.toJson()).toList());
+    'urlProblems',
+    instance.urlProblems?.map((e) => e.toJson()).toList(),
+  );
   writeNotNull('errorMessage', instance.errorMessage);
   return val;
 }
